@@ -39,6 +39,25 @@ const resolvers = {
         },
         evolution_trigger: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEvolutionTrigger(parent);
+        },
+        locations: (parent, args, { dataSources }) => {
+            // return dataSources.pokemonAPI.getPokemonLocationIds(parent);
+            // return {pokemonid: parent, locationNames: dataSources.pokemonAPI.getPokemonLocationNames(parent)}
+            return dataSources.pokemonAPI.getPokemonLocationObjects(parent);
+        }
+    },
+    Location: {
+        id: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonLocationId(parent);
+        },
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonLocationName(parent);
+        },
+        games: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonLocationGames(parent);
+        },
+        pokemon: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getLocationPokemonEncounters(parent);
         }
     }
 };
