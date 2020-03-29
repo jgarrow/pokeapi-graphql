@@ -25,6 +25,9 @@ const resolvers = {
         weight: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonWeight(parent);
         },
+        nat_dex_num: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getNationalPokedexNumber(parent);
+        },
         evolves_to: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getWhoPokemonEvolvesTo(parent);
         },

@@ -179,8 +179,6 @@ class PokemonAPI extends RESTDataSource {
                             evoDetailsObj[key] !== "" &&
                             key !== "trigger"
                     );
-
-                    // console.log("criteriaKeys: ", criteriaKeys);
                     return criteriaKeys
                         .map(key => {
                             return {
@@ -195,7 +193,6 @@ class PokemonAPI extends RESTDataSource {
                 })
                 .flat();
         }
-        console.log("evolved_at_criteria: ", evolved_at_criteria);
 
         return evolved_at_criteria;
     }
@@ -224,7 +221,7 @@ class PokemonAPI extends RESTDataSource {
             }
         });
 
-        // console.log("currentPokemon: ", currentPokemon);
+        // trigger is the same regardless of if there is more than one object in 'evolution_details'
         if (currentPokemon) {
             return currentPokemon.evolution_details[0].trigger.name;
         } else {
@@ -257,6 +254,22 @@ class PokemonAPI extends RESTDataSource {
         }
 
         return evolves_from;
+    }
+
+    async getNationalPokedexNumber(id) {
+        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+
+        const dexNumbers = speciesResponse.pokedex_numbers;
+
+        const nationalDexObj = dexNumbers.find(
+            pokedex => pokedex.pokedex.name === "national"
+        );
+
+        return parseInt(nationalDexObj.entry_number);
+    }
+
+    async getPokemonLocationsIds(pokemonId) {
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
     }
 }
 

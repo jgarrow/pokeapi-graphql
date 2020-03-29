@@ -18,8 +18,6 @@ const typeDefs = gql`
         dex_entries: [DexEntry] # array of DexEntry objects
         moves: [Move] # array of Move objects
         locations: [Location] # array of Location objects
-        # evolves_to: [EvolutionPokemon]
-
         evolves_from: Pokemon
         evolution_criteria: [EvolutionCriteria]
         evolution_trigger: String
