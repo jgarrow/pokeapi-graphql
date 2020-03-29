@@ -18,15 +18,18 @@ const typeDefs = gql`
         dex_entries: [DexEntry] # array of DexEntry objects
         moves: [Move] # array of Move objects
         locations: [Location] # array of Location objects
-        evolves_to: [EvolutionPokemon]
+        # evolves_to: [EvolutionPokemon]
 
-        # evolves_from: Pokemon
-        # evolves_from_method: String # ex. 'level-up' , 'item'
-        # evolves_from_trigger: String # ex. '16' , 'water-stone'
-        # evolves_to: Pokemon
-        # evolves_to_method: String # ex. 'level-up' , 'item'
-        # evolves_to_trigger: [String] # ex. '16' , 'water-stone'
-        evolution_tier: Int # 1, 2, or 3
+        evolves_from: Pokemon
+        evolution_criteria: [EvolutionCriteria]
+        evolution_criteria_trigger: String
+
+        evolves_to: [Pokemon]
+        # evolves_at_criteria: [EvolutionCriteria] # ex. 'level-up' , 'item'
+        # evolves_at_trigger: String # ex. '16' , 'water-stone'
+        # evolves_to_method: [String] # ex. 'level-up' , 'item'
+        # evolves_to_trigger: String # ex. '16' , 'water-stone'
+        # evolution_tier: Int # 1, 2, or 3
         # evolution_chain: [EvolutionPokemon] # array of EvolutionPokemon objects
     }
 
@@ -50,6 +53,11 @@ const typeDefs = gql`
     type Sprite {
         # name: String
         url: String # image src url
+    }
+
+    type EvolutionCriteria {
+        name: String # item
+        value: String # thunder-stone
     }
 
     type EvolutionPokemon {

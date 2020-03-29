@@ -87,31 +87,34 @@ class PokemonAPI extends RESTDataSource {
         return pokemonId;
     }
 
-    async getPokemon(id) {
-        const pokemonData = {
-            id: null,
-            name: null,
-            height: null,
-            weight: null,
-            nat_dex_num: null,
-            egg_group: null,
-            abilities: null,
-            sprites: null,
-            base_stats: null,
-            dex_entries: null,
-            moves: null,
-            locations: null,
-            evolves_to: null,
-            evolves_from: null
-        };
-
-        console.log("basic endpoint: ", `/pokemon/${id}`);
+    async getPokemonId(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
+        return basicResponse.id;
+    }
 
-        pokemonData.id = basicResponse.id;
-        pokemonData.name = basicResponse.name;
-        pokemonData.height = basicResponse.height;
-        pokemonData.weight = basicResponse.weight;
+    async getPokemonName(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        return basicResponse.name;
+    }
+
+    async getPokemonHeight(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        return basicResponse.height;
+    }
+
+    async getPokemonWeight(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        return basicResponse.weight;
+    }
+
+    async getWhoPokemonEvolvesTo(id) {
+        // let promise = this.memoizedResults.get(`/pokemon/${id}`);
+        // if (promise) return promise;
+
+        let evolves_to = null;
+
+        // need to get name for getEvolvesToPokemonId method
+        const basicResponse = await this.get(`/pokemon/${id}`);
 
         const speciesResponse = await this.get(`/pokemon-species/${id}`);
 
@@ -120,22 +123,111 @@ class PokemonAPI extends RESTDataSource {
         );
 
         // an array because a pokemon has potential to evolve to multiple other pokemon (i.e. eevee, kirlia, snorunt)
-        const evolvesToIdArray = this.getEvolvesToPokemonId(
-            pokemonData.name,
+        const evolvesToIdArray = await this.getEvolvesToPokemonId(
+            basicResponse.name,
             evolutionChainResponse
         );
 
-        // now need to recursively call getPokemon for each id in evolvesToIdArray to get the Pokemon object for each pokemon that the current pokemon can evolve to
+        // if current pokemon can evolve
+        // console.log("evolvesToIdArray: ", evolvesToIdArray);
+
+        if (evolvesToIdArray.length) {
+            // console.log("1");
+            evolves_to = await evolvesToIdArray.map(async id => {
+                // console.log(id);
+                // to get info for evolves_to method(s) and trigger for current pokemon, look at the evolves_from_method and evolves_from_trigger for the current pokemon's `evolve_to` Pokemon
+
+                // just getting name for now while I figure things out
+                const pokemonObj = this.getPokemonName(id);
+                // console.log("pokemonObj: ", pokemonObj);
+                return pokemonObj;
+            });
+            // console.log("3");
+        }
+
+        console.log("evolvesToArray: ", evolves_to);
+        return evolves_to;
+    }
+
+    // evolution details for how the Pokemon evolved from their previous evolution tier (i.e. current pokemon is charmeleon, get details for how charmander evolved into charmeleon)
+    async getEvolvedAtDetails(id) {
+        // only get if current pokemon is tier 2 or 3
+
+        let evolved_at_criteria = null;
+
+        // need to get name for getEvolvesToPokemonId method
+        const basicResponse = await this.get(`/pokemon/${id}`);
+
+        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+
+        const evolutionChainResponse = await this.get(
+            speciesResponse.evolution_chain.url
+        );
+
+        let currentPokemon = null;
+
+        evolutionChainResponse.chain.evolves_to.forEach(tierIIPokemon => {
+            tierIIPokemon.evolves_to.forEach(tierIIIPokemon => {
+                if (tierIIIPokemon.species.name === basicResponse.name) {
+                    currentPokemon = tierIIIPokemon;
+                }
+            });
+
+            if (tierIIPokemon.species.name === basicResponse.name) {
+                currentPokemon = tierIIPokemon;
+            }
+        });
+
+        if (currentPokemon) {
+            currentPokemon.evolution_details.forEach(evoDetailsObj => {
+                const criteriaKeys = Object.keys(evoDetailsObj).filter(
+                    key =>
+                        evoDetailsObj[key] &&
+                        evoDetailsObj[key] !== "" &&
+                        key !== "trigger"
+                );
+
+                evolved_at_criteria = criteriaKeys.map(key => {
+                    return {
+                        name: key,
+                        value:
+                            typeof evoDetailsObj[key] === "object"
+                                ? evoDetailsObj[key].name
+                                : evoDetailsObj[key].toString()
+                    };
+                });
+            });
+        }
+
+        return evolved_at_criteria;
+    }
+
+    async getWhoPokemonEvolvesFrom(id) {
+        let evolves_from = null;
+
+        // need to get name for getEvolvesToPokemonId method
+        const basicResponse = await this.get(`/pokemon/${id}`);
+
+        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+
+        const evolutionChainResponse = await this.get(
+            speciesResponse.evolution_chain.url
+        );
 
         // not an array because a pokemon can only evolve from 1 pokemon
-        const evolvesFromId = this.getEvolvesFromPokemonId(
-            pokemonData.name,
+        const evolvesFromId = await this.getEvolvesFromPokemonId(
+            basicResponse.name,
             evolutionChainResponse
         );
 
-        // now need to recursively call getPokemon for evolvesFromId to get the Pokemon object for the pokemon that the current pokemon evolves from
+        // if current pokemon evolved from another pokemon
+        console.log("evolvesFromId: ", evolvesFromId);
+        if (evolvesFromId) {
+            // just getting name for now while I figure things out
+            evolves_from = this.getPokemonName(evolvesFromId);
+        }
 
-        return pokemonData;
+        return evolves_from;
     }
 }
 
