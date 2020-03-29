@@ -129,23 +129,15 @@ class PokemonAPI extends RESTDataSource {
         );
 
         // if current pokemon can evolve
-        // console.log("evolvesToIdArray: ", evolvesToIdArray);
-
         if (evolvesToIdArray.length) {
-            // console.log("1");
             evolves_to = await evolvesToIdArray.map(async id => {
-                // console.log(id);
                 // to get info for evolves_to method(s) and trigger for current pokemon, look at the evolves_from_method and evolves_from_trigger for the current pokemon's `evolve_to` Pokemon
 
                 // just getting name for now while I figure things out
                 const pokemonObj = this.getPokemonName(id);
-                // console.log("pokemonObj: ", pokemonObj);
                 return pokemonObj;
             });
-            // console.log("3");
         }
-
-        console.log("evolvesToArray: ", evolves_to);
         return evolves_to;
     }
 
@@ -179,27 +171,65 @@ class PokemonAPI extends RESTDataSource {
         });
 
         if (currentPokemon) {
-            currentPokemon.evolution_details.forEach(evoDetailsObj => {
-                const criteriaKeys = Object.keys(evoDetailsObj).filter(
-                    key =>
-                        evoDetailsObj[key] &&
-                        evoDetailsObj[key] !== "" &&
-                        key !== "trigger"
-                );
+            evolved_at_criteria = currentPokemon.evolution_details
+                .map(evoDetailsObj => {
+                    const criteriaKeys = Object.keys(evoDetailsObj).filter(
+                        key =>
+                            evoDetailsObj[key] &&
+                            evoDetailsObj[key] !== "" &&
+                            key !== "trigger"
+                    );
 
-                evolved_at_criteria = criteriaKeys.map(key => {
-                    return {
-                        name: key,
-                        value:
-                            typeof evoDetailsObj[key] === "object"
-                                ? evoDetailsObj[key].name
-                                : evoDetailsObj[key].toString()
-                    };
-                });
-            });
+                    // console.log("criteriaKeys: ", criteriaKeys);
+                    return criteriaKeys
+                        .map(key => {
+                            return {
+                                name: key,
+                                value:
+                                    typeof evoDetailsObj[key] === "object"
+                                        ? evoDetailsObj[key].name
+                                        : evoDetailsObj[key].toString()
+                            };
+                        })
+                        .flat();
+                })
+                .flat();
         }
+        console.log("evolved_at_criteria: ", evolved_at_criteria);
 
         return evolved_at_criteria;
+    }
+
+    async getEvolutionTrigger(id) {
+        // need to get name for getEvolvesToPokemonId method
+        const basicResponse = await this.get(`/pokemon/${id}`);
+
+        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+
+        const evolutionChainResponse = await this.get(
+            speciesResponse.evolution_chain.url
+        );
+
+        let currentPokemon = null;
+
+        evolutionChainResponse.chain.evolves_to.forEach(tierIIPokemon => {
+            tierIIPokemon.evolves_to.forEach(tierIIIPokemon => {
+                if (tierIIIPokemon.species.name === basicResponse.name) {
+                    currentPokemon = tierIIIPokemon;
+                }
+            });
+
+            if (tierIIPokemon.species.name === basicResponse.name) {
+                currentPokemon = tierIIPokemon;
+            }
+        });
+
+        // console.log("currentPokemon: ", currentPokemon);
+        if (currentPokemon) {
+            return currentPokemon.evolution_details[0].trigger.name;
+        } else {
+            return null;
+        }
     }
 
     async getWhoPokemonEvolvesFrom(id) {
@@ -221,7 +251,6 @@ class PokemonAPI extends RESTDataSource {
         );
 
         // if current pokemon evolved from another pokemon
-        console.log("evolvesFromId: ", evolvesFromId);
         if (evolvesFromId) {
             // just getting name for now while I figure things out
             evolves_from = this.getPokemonName(evolvesFromId);

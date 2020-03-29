@@ -22,15 +22,8 @@ const typeDefs = gql`
 
         evolves_from: Pokemon
         evolution_criteria: [EvolutionCriteria]
-        evolution_criteria_trigger: String
-
+        evolution_trigger: String
         evolves_to: [Pokemon]
-        # evolves_at_criteria: [EvolutionCriteria] # ex. 'level-up' , 'item'
-        # evolves_at_trigger: String # ex. '16' , 'water-stone'
-        # evolves_to_method: [String] # ex. 'level-up' , 'item'
-        # evolves_to_trigger: String # ex. '16' , 'water-stone'
-        # evolution_tier: Int # 1, 2, or 3
-        # evolution_chain: [EvolutionPokemon] # array of EvolutionPokemon objects
     }
 
     type Type { # Pokemon type (i.e. Grass, Electric, Water, etc)
