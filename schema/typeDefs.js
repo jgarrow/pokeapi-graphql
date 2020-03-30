@@ -109,8 +109,10 @@ const typeDefs = gql`
     }
 
     type Location {
-        id: Int
+        location_id: Int # for the /location-area/id endpoint
+        location_area_id: Int # for the /location/id endpoint
         name: String
+        region: String
         games: [String] # which game/version pokemon is found at this location
         pokemon: [Pokemon] # array of pokemon that can be found at this location
     }

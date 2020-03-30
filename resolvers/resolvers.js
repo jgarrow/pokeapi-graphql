@@ -10,6 +10,15 @@ const resolvers = {
         },
         pokemon: (parent, args, { dataSources }) => {
             return args.number;
+        },
+        move: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        ability: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        location: (parent, args, { dataSources }) => {
+            return args.id;
         }
     },
     Pokemon: {
@@ -87,11 +96,17 @@ const resolvers = {
         }
     },
     Location: {
-        id: (parent, args, { dataSources }) => {
+        location_id: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonLocationId(parent);
+        },
+        location_area_id: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonLocationAreaId(parent);
         },
         name: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonLocationName(parent);
+        },
+        region: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonLocationRegion(parent);
         },
         games: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonLocationGames(parent);

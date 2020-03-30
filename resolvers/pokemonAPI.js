@@ -322,12 +322,39 @@ class PokemonAPI extends RESTDataSource {
     }
 
     // can use location id to hit `/location-area/${id}` for Location type
-    async getPokemonLocationId(locationObj) {
+    async getPokemonLocationAreaId(locationObj) {
         return parseUrl(locationObj.location_area.url);
     }
 
+    async getPokemonLocationId(locationObj) {
+        const locationAreaId = await this.getPokemonLocationAreaId(locationObj);
+
+        const locationAreaResponse = await this.get(
+            `/location-area/${locationAreaId}`
+        );
+
+        const locationId = parseUrl(locationAreaResponse.location.url);
+
+        return locationId;
+    }
+
     async getPokemonLocationName(locationObj) {
-        return locationObj.location_area.name;
+        const locationId = await this.getPokemonLocationId(locationObj);
+        const locationResponse = await this.get(`/location/${locationId}`);
+
+        const allNames = locationResponse.names;
+        const englishName = allNames.find(name => name.language.name === "en")
+            .name;
+
+        return englishName;
+    }
+
+    async getPokemonLocationRegion(locationObj) {
+        const locationId = await this.getPokemonLocationId(locationObj);
+        const locationResponse = await this.get(`/location/${locationId}`);
+        const region = locationResponse.region.name;
+
+        return region;
     }
 
     async getPokemonLocationGames(locationObj) {
