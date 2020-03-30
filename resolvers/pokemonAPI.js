@@ -403,6 +403,30 @@ class PokemonAPI extends RESTDataSource {
 
         return pokemonList;
     }
+
+    async getPokemonPokedexEntries(pokemonId) {
+        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+
+        // just get the english entries
+        let pokedexEntries = speciesResponse.flavor_text_entries.filter(
+            entry => entry.language.name === "en"
+        );
+
+        // make all whitespace consistent
+        pokedexEntries.forEach(entry => {
+            entry.flavor_text = entry.flavor_text.replace(/\s/gm, " ");
+        });
+
+        return pokedexEntries;
+    }
+
+    async getPokedexEntryDescription(entryObj) {
+        return entryObj.flavor_text;
+    }
+
+    async getPokedexEntryVersion(entryObj) {
+        return entryObj.version.name;
+    }
 }
 
 module.exports = { PokemonAPI };
