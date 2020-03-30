@@ -592,6 +592,8 @@ class PokemonAPI extends RESTDataSource {
         const learnMethods = desiredMove.version_group_details.map(game => {
             return {
                 method: game.move_learn_method.name,
+                level_learned_at:
+                    game.level_learned_at > 0 ? game.level_learned_at : null,
                 game: game.version_group.name
             };
         });

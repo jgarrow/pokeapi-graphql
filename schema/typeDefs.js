@@ -87,7 +87,7 @@ const typeDefs = gql`
         name: String
         type: Type
         learn_methods: [MoveLearnMethod] # level, egg, move tutor, tm/hm
-        level_learned_at: Int
+        # level_learned_at: Int
         power: Int
         accuracy: Int
         pp: Int
@@ -98,6 +98,7 @@ const typeDefs = gql`
 
     type MoveLearnMethod {
         method: String
+        level_learned_at: Int
         game: String
     }
 
