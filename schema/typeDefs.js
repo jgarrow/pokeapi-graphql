@@ -20,7 +20,7 @@ const typeDefs = gql`
         egg_group: [EggGroup]
         abilities: [Ability] # array of Ability objects
         sprites: [Sprite] # array of Sprite objects
-        base_stats: Stats # array of Stat objects
+        # base_stats: Stats # array of Stat objects
         dex_entries: [DexEntry] # array of DexEntry objects
         moves: [Move] # array of Move objects
         locations: [Location] # array of Location objects

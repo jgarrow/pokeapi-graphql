@@ -160,11 +160,6 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getWhoPokemonEvolvesTo(id) {
-        // let promise = this.memoizedResults.get(`/pokemon/${id}`);
-        // if (promise) return promise;
-
-        let evolves_to = null;
-
         // need to get name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
@@ -180,17 +175,7 @@ class PokemonAPI extends RESTDataSource {
             evolutionChainResponse
         );
 
-        // if current pokemon can evolve
-        if (evolvesToIdArray.length) {
-            evolves_to = await evolvesToIdArray.map(async id => {
-                // to get info for evolves_to method(s) and trigger for current pokemon, look at the evolves_from_method and evolves_from_trigger for the current pokemon's `evolve_to` Pokemon
-
-                // just getting name for now while I figure things out
-                const pokemonObj = this.getPokemonName(id);
-                return pokemonObj;
-            });
-        }
-        return evolves_to;
+        return evolvesToIdArray.length ? evolvesToIdArray : null;
     }
 
     // evolution details for how the Pokemon evolved from their previous evolution tier (i.e. current pokemon is charmeleon, get details for how charmander evolved into charmeleon)
@@ -282,8 +267,6 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getWhoPokemonEvolvesFrom(id) {
-        let evolves_from = null;
-
         // need to get name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
@@ -299,13 +282,7 @@ class PokemonAPI extends RESTDataSource {
             evolutionChainResponse
         );
 
-        // if current pokemon evolved from another pokemon
-        if (evolvesFromId) {
-            // just getting name for now while I figure things out
-            evolves_from = this.getPokemonName(evolvesFromId);
-        }
-
-        return evolves_from;
+        return evolvesFromId ? evolvesFromId : null;
     }
 
     async getNationalPokedexNumber(id) {
