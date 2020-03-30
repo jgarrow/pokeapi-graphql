@@ -335,6 +335,54 @@ class PokemonAPI extends RESTDataSource {
 
         return pokemonEncounters;
     }
+
+    async getAbilitiesIds(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const abilities = basicResponse.abilities;
+        const abilityIds = abilities.map(ability =>
+            parseUrl(ability.ability.url)
+        );
+
+        return abilityIds;
+    }
+
+    async getAbilityName(abilityId) {
+        const abilityResponse = await this.get(`/ability/${abilityId}`);
+
+        const name = abilityResponse.name;
+
+        return name;
+    }
+
+    async getAbilityEffects(abilityId) {
+        const abilityResponse = await this.get(`/ability/${abilityId}`);
+
+        const effects = abilityResponse.effect_entries.map(
+            effect => effect.effect
+        );
+
+        return effects;
+    }
+
+    async getAbilityIsHidden(pokemonId, abilityId) {
+        const pokemonResponse = await this.get(`/pokemon/${pokemonId}`);
+
+        const abilityObj = pokemonResponse.abilities.find(
+            ability => parseUrl(ability.ability.url) === abilityId
+        );
+
+        return abilityObj.is_hidden;
+    }
+
+    async getPokemonThatCanHaveAbility(abilityId) {
+        const abilityResponse = await this.get(`/ability/${abilityId}`);
+
+        const pokemonList = abilityResponse.pokemon.map(pokemon =>
+            parseUrl(pokemon.pokemon.url)
+        );
+
+        return pokemonList;
+    }
 }
 
 module.exports = { PokemonAPI };

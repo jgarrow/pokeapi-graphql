@@ -44,7 +44,9 @@ const typeDefs = gql`
     type Ability {
         id: Int
         name: String
-        effect: String
+        is_hidden: Boolean
+        effects: [String]
+        pokemon: [Pokemon]
     }
 
     type Sprite {

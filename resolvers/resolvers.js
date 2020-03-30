@@ -62,6 +62,20 @@ const resolvers = {
             // return dataSources.pokemonAPI.getPokemonLocationIds(parent);
             // return {pokemonid: parent, locationNames: dataSources.pokemonAPI.getPokemonLocationNames(parent)}
             return dataSources.pokemonAPI.getPokemonLocationObjects(parent);
+        },
+        abilities: async (parent, args, { dataSources }) => {
+            const abilityIds = await dataSources.pokemonAPI.getAbilitiesIds(
+                parent
+            );
+
+            const pokemonAndAbilityIds = abilityIds.map(ability => {
+                return {
+                    pokemonId: parent,
+                    abilityId: ability
+                };
+            });
+
+            return pokemonAndAbilityIds;
         }
     },
     Location: {
@@ -76,6 +90,26 @@ const resolvers = {
         },
         pokemon: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getLocationPokemonEncounters(parent);
+        }
+    },
+    Ability: {
+        id: (parent, args, { dataSources }) => parent.abilityId,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAbilityName(parent.abilityId);
+        },
+        is_hidden: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAbilityIsHidden(
+                parent.pokemonId,
+                parent.abilityId
+            );
+        },
+        effects: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAbilityEffects(parent.abilityId);
+        },
+        pokemon: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonThatCanHaveAbility(
+                parent.abilityId
+            );
         }
     }
 };
