@@ -107,6 +107,58 @@ class PokemonAPI extends RESTDataSource {
         return basicResponse.weight;
     }
 
+    async getAttackStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const attack = stats.find(stat => stat.stat.name === "attack");
+
+        return attack.base_stat;
+    }
+
+    async getDefenseStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const defense = stats.find(stat => stat.stat.name === "defense");
+
+        return defense.base_stat;
+    }
+
+    async getSpeedStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const speed = stats.find(stat => stat.stat.name === "speed");
+
+        return speed.base_stat;
+    }
+
+    async getSpecialAttackStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const specialAttack = stats.find(
+            stat => stat.stat.name === "special-attack"
+        );
+
+        return specialAttack.base_stat;
+    }
+
+    async getSpecialDefenseStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const specialDefense = stats.find(
+            stat => stat.stat.name === "special-defense"
+        );
+
+        return specialDefense.base_stat;
+    }
+
+    async getHpStat(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const hp = stats.find(stat => stat.stat.name === "hp");
+
+        return hp.base_stat;
+    }
+
     async getWhoPokemonEvolvesTo(id) {
         // let promise = this.memoizedResults.get(`/pokemon/${id}`);
         // if (promise) return promise;
