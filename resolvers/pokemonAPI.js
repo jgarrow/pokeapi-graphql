@@ -498,8 +498,6 @@ class PokemonAPI extends RESTDataSource {
         return pokemonIds;
     }
 
-    // Moves, Egg groups, and Sprites
-
     async getEggGroupIds(pokemonId) {
         const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
         const eggGroups = speciesResponse.egg_groups;
@@ -521,6 +519,84 @@ class PokemonAPI extends RESTDataSource {
         const pokemonIds = pokemon.map(pokemon => parseUrl(pokemon.url));
 
         return pokemonIds;
+    }
+
+    async getMoveIds(pokemonId) {
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
+
+        const moves = basicResponse.moves;
+        const moveIds = moves.map(move => parseUrl(move.move.url));
+
+        return moveIds;
+    }
+
+    async getMoveName(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+
+        return moveResponse.name;
+    }
+
+    async getMoveTypeId(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+
+        const moveTypeId = parseUrl(moveResponse.type.url);
+        return moveTypeId;
+    }
+
+    // special or physical
+    async getMoveDamageClass(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        const damageClass = moveResponse.damage_class.name;
+        return damageClass;
+    }
+
+    async getMovePower(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        return moveResponse.power;
+    }
+
+    async getMovePp(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        return moveResponse.pp;
+    }
+
+    async getMoveAccuracy(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        return moveResponse.accuracy;
+    }
+
+    async getMoveEffectChance(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        return moveResponse.effect_chance;
+    }
+
+    async getMoveEffects(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+        const moveEffects = moveResponse.effect_entries.map(async effect => {
+            const moveEffectChance = await this.getMoveEffectChance(moveId);
+
+            return effect.effect.replace("$effect_chance", moveEffectChance);
+        });
+
+        return moveEffects;
+    }
+    l;
+    async getMoveLearnMethods(pokemonId, moveId) {
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
+        const moves = basicResponse.moves;
+
+        const desiredMove = moves.find(
+            move => parseUrl(move.move.url) === moveId
+        );
+
+        const learnMethods = desiredMove.version_group_details.map(game => {
+            return {
+                method: game.move_learn_method.name,
+                game: game.version_group.name
+            };
+        });
+
+        return learnMethods;
     }
 }
 

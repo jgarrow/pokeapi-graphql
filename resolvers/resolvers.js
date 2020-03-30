@@ -70,6 +70,17 @@ const resolvers = {
         },
         egg_groups: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEggGroupIds(parent);
+        },
+        moves: async (parent, args, { dataSources }) => {
+            const moveIds = await dataSources.pokemonAPI.getMoveIds(parent);
+            const pokemonAndMoveIds = moveIds.map(moveId => {
+                return {
+                    pokemonId: parent,
+                    moveId: moveId
+                };
+            });
+
+            return pokemonAndMoveIds;
         }
     },
     Location: {
@@ -148,6 +159,36 @@ const resolvers = {
         },
         pokemon: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEggGroupPokemonIds(parent);
+        }
+    },
+    Move: {
+        id: (parent, args, { dataSources }) => parent,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveName(parent.moveId);
+        },
+        type: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveTypeId(parent.moveId);
+        },
+        damage_class: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveDamageClass(parent.moveId);
+        },
+        power: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMovePower(parent.moveId);
+        },
+        pp: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMovePp(parent.moveId);
+        },
+        accuracy: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveAccuracy(parent.moveId);
+        },
+        effects: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveEffects(parent.moveId);
+        },
+        learn_methods: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveLearnMethods(
+                parent.pokemonId,
+                parent.moveId
+            );
         }
     }
 };

@@ -85,15 +85,20 @@ const typeDefs = gql`
     type Move {
         id: Int
         name: String
-        learn_method: String # level, egg, move tutor, tm/hm
-        level_learned_at: Int
         type: Type
+        learn_methods: [MoveLearnMethod] # level, egg, move tutor, tm/hm
+        level_learned_at: Int
         power: Int
         accuracy: Int
         pp: Int
-        effect: String # possible status condition effect
+        effects: [String] # possible status condition effect
         damage_class: String # physical or special
-        description: String
+        # description: String
+    }
+
+    type MoveLearnMethod {
+        method: String
+        game: String
     }
 
     type Location {
