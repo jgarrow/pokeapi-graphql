@@ -81,6 +81,9 @@ const resolvers = {
             });
 
             return pokemonAndMoveIds;
+        },
+        sprites: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonSprites(parent);
         }
     },
     Location: {

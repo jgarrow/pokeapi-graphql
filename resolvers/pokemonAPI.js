@@ -600,6 +600,12 @@ class PokemonAPI extends RESTDataSource {
 
         return learnMethods;
     }
+
+    async getPokemonSprites(pokemonId) {
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
+
+        return basicResponse.sprites;
+    }
 }
 
 module.exports = { PokemonAPI };

@@ -13,7 +13,7 @@ const typeDefs = gql`
         category: String # if available (the puppy pokemon)
         egg_groups: [EggGroup]
         abilities: [Ability] # array of Ability objects
-        sprites: [Sprite] # array of Sprite objects
+        sprites: Sprites # array of Sprite objects
         base_stats: Stats # array of Stat objects
         pokedex_entries: [DexEntry] # array of DexEntry objects
         moves: [Move] # array of Move objects
@@ -50,9 +50,15 @@ const typeDefs = gql`
         pokemon: [Pokemon]
     }
 
-    type Sprite {
-        # name: String
-        url: String # image src url
+    type Sprites {
+        back_default: String
+        back_female: String
+        back_shiny: String
+        back_shiny_female: String
+        front_default: String
+        front_female: String
+        front_shiny: String
+        front_shiny_female: String
     }
 
     type EvolutionCriteria {
