@@ -427,6 +427,76 @@ class PokemonAPI extends RESTDataSource {
     async getPokedexEntryVersion(entryObj) {
         return entryObj.version.name;
     }
+
+    async getPokemonTypeIds(pokemonId) {
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
+        const types = basicResponse.types;
+        const typeIds = types.map(type => parseUrl(type.type.url));
+        return typeIds;
+    }
+
+    async getPokemonTypeName(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        return typeResponse.name;
+    }
+
+    async getTypeDoubleDamageFrom(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.double_damage_from;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds;
+    }
+
+    async getTypeDoubleDamageTo(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.double_damage_to;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds;
+    }
+
+    async getTypeHalfDamageFrom(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.half_damage_from;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds;
+    }
+
+    async getTypeHalfDamageTo(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.half_damage_to;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds;
+    }
+
+    async getTypeNoDamageFrom(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.no_damage_from;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds.length ? typeIds : null;
+    }
+
+    async getTypeNoDamageTo(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const types = typeResponse.damage_relations.no_damage_to;
+        const typeIds = types.map(type => parseUrl(type.url));
+
+        return typeIds.length ? typeIds : null;
+    }
+
+    async getPokemonOfType(typeId) {
+        const typeResponse = await this.get(`/type/${typeId}`);
+        const pokemon = typeResponse.pokemon;
+        const pokemonIds = pokemon.map(pokemon =>
+            parseUrl(pokemon.pokemon.url)
+        );
+
+        return pokemonIds;
+    }
 }
 
 module.exports = { PokemonAPI };

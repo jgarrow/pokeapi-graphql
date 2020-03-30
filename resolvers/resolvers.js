@@ -64,6 +64,9 @@ const resolvers = {
             });
 
             return pokemonAndAbilityIds;
+        },
+        types: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonTypeIds(parent);
         }
     },
     Location: {
@@ -106,6 +109,33 @@ const resolvers = {
         },
         game: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokedexEntryVersion(parent);
+        }
+    },
+    Type: {
+        id: (parent, args, { dataSources }) => parent,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonTypeName(parent);
+        },
+        pokemon: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonOfType(parent);
+        },
+        double_damage_from: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeDoubleDamageFrom(parent);
+        },
+        double_damage_to: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeDoubleDamageTo(parent);
+        },
+        half_damage_from: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeHalfDamageFrom(parent);
+        },
+        half_damage_to: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeHalfDamageTo(parent);
+        },
+        no_damage_from: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeNoDamageFrom(parent);
+        },
+        no_damage_to: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getTypeNoDamageTo(parent);
         }
     }
 };

@@ -27,6 +27,13 @@ const typeDefs = gql`
     type Type { # Pokemon type (i.e. Grass, Electric, Water, etc)
         name: String
         id: Int
+        double_damage_from: [Type]
+        double_damage_to: [Type]
+        half_damage_from: [Type]
+        half_damage_to: [Type]
+        no_damage_from: [Type]
+        no_damage_to: [Type]
+        pokemon: [Pokemon]
     }
 
     type EggGroup {
