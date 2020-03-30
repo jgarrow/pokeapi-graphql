@@ -497,6 +497,31 @@ class PokemonAPI extends RESTDataSource {
 
         return pokemonIds;
     }
+
+    // Moves, Egg groups, and Sprites
+
+    async getEggGroupIds(pokemonId) {
+        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+        const eggGroups = speciesResponse.egg_groups;
+        const eggGroupIds = eggGroups.map(eggGroup => parseUrl(eggGroup.url));
+
+        return eggGroupIds;
+    }
+
+    async getEggGroupName(eggGroupId) {
+        const eggGroupResponse = await this.get(`/egg-group/${eggGroupId}`);
+
+        return eggGroupResponse.name;
+    }
+
+    async getEggGroupPokemonIds(eggGroupId) {
+        const eggGroupResponse = await this.get(`/egg-group/${eggGroupId}`);
+
+        const pokemon = eggGroupResponse.pokemon_species;
+        const pokemonIds = pokemon.map(pokemon => parseUrl(pokemon.url));
+
+        return pokemonIds;
+    }
 }
 
 module.exports = { PokemonAPI };

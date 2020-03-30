@@ -67,6 +67,9 @@ const resolvers = {
         },
         types: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonTypeIds(parent);
+        },
+        egg_groups: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getEggGroupIds(parent);
         }
     },
     Location: {
@@ -136,6 +139,15 @@ const resolvers = {
         },
         no_damage_to: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getTypeNoDamageTo(parent);
+        }
+    },
+    EggGroup: {
+        id: (parent, args, { dataSources }) => parent,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getEggGroupName(parent);
+        },
+        pokemon: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getEggGroupPokemonIds(parent);
         }
     }
 };

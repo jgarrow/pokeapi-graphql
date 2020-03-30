@@ -11,7 +11,7 @@ const typeDefs = gql`
         weight: Int
         gender: String # if available
         category: String # if available (the puppy pokemon)
-        egg_group: [EggGroup]
+        egg_groups: [EggGroup]
         abilities: [Ability] # array of Ability objects
         sprites: [Sprite] # array of Sprite objects
         base_stats: Stats # array of Stat objects
