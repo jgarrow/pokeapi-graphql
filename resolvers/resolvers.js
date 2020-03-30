@@ -25,24 +25,27 @@ const resolvers = {
         weight: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonWeight(parent);
         },
-        attack: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getAttackStat(parent);
+        base_stats: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonBaseStats(parent);
         },
-        defense: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getDefenseStat(parent);
-        },
-        speed: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getSpeedStat(parent);
-        },
-        special_attack: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getSpecialAttackStat(parent);
-        },
-        special_defense: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getSpecialDefenseStat(parent);
-        },
-        hp: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getHpStat(parent);
-        },
+        // attack: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getAttackStat(parent);
+        // },
+        // defense: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getDefenseStat(parent);
+        // },
+        // speed: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getSpeedStat(parent);
+        // },
+        // special_attack: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getSpecialAttackStat(parent);
+        // },
+        // special_defense: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getSpecialDefenseStat(parent);
+        // },
+        // hp: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getHpStat(parent);
+        // },
         nat_dex_num: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getNationalPokedexNumber(parent);
         },

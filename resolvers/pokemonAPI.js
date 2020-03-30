@@ -159,6 +159,26 @@ class PokemonAPI extends RESTDataSource {
         return hp.base_stat;
     }
 
+    async getPokemonBaseStats(id) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const stats = basicResponse.stats;
+        const attack = await this.getAttackStat(id);
+        const defense = await this.getDefenseStat(id);
+        const specialAttack = await this.getSpecialAttackStat(id);
+        const specialDefense = await this.getSpecialDefenseStat(id);
+        const speed = await this.getSpeedStat(id);
+        const hp = await this.getHpStat(id);
+
+        return {
+            attack: parseInt(attack),
+            defense: parseInt(defense),
+            speed: parseInt(speed),
+            special_attack: parseInt(specialAttack),
+            special_defense: parseInt(specialDefense),
+            hp: parseInt(hp)
+        };
+    }
+
     async getWhoPokemonEvolvesTo(id) {
         // need to get name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
