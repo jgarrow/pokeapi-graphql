@@ -7,6 +7,75 @@ class PokemonAPI extends RESTDataSource {
         this.baseURL = "https://pokeapi.co/api/v2";
     }
 
+    async getAllPokemon(start = 0, end = 964) {
+        const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
+
+        const pokemonIds = response.results.map(pokemon =>
+            parseUrl(pokemon.url)
+        );
+
+        return pokemonIds;
+    }
+
+    async getAllTypes(start = 0, end = 20) {
+        const response = await this.get(`type?offset=${start}&limit=${end}`);
+
+        const typeIds = response.results.map(type => parseUrl(type.url));
+
+        return typeIds;
+    }
+
+    async getAllMoves(start = 0, end = 746) {
+        const response = await this.get(`move?offset=${start}&limit=${end}`);
+
+        const moveIds = response.results.map(move => {
+            return {
+                moveId: parseUrl(move.url)
+            };
+        });
+
+        console.log(moveIds);
+        return moveIds;
+    }
+
+    async getAllAbilities(start = 0, end = 293) {
+        const response = await this.get(`ability?offset=${start}&limit=${end}`);
+
+        const abilityIds = response.results.map(ability => {
+            return { abilityId: parseUrl(ability.url) };
+        });
+
+        return abilityIds;
+    }
+
+    async getAllEggGroups(start = 0, end = 15) {
+        const response = await this.get(
+            `egg-group?offset=${start}&limit=${end}`
+        );
+
+        const eggGroupdIds = response.results.map(eggGroup =>
+            parseUrl(eggGroup.url)
+        );
+
+        return eggGroupdIds;
+    }
+
+    async getAllRegions(start = 0, end = 7) {
+        const response = await this.get(`region?offset=${start}&limit=${end}`);
+
+        const regionIds = response.results.map(region => parseUrl(region.url));
+
+        return regionIds;
+    }
+
+    async getAllGames(start = 0, end = 30) {
+        const response = await this.get(`/version?offset=${start}&end=${end}`);
+
+        const gameIds = response.results.map(game => parseUrl(game.url));
+
+        return gameIds;
+    }
+
     // evolutionChainObj is the data object response from the evolution-chain endpoint
     async getEvolvesToPokemonId(currentPokemonName, evolutionChainObj) {
         // don't need evolution tier III because the third tier can't evolve into anything else
@@ -317,18 +386,33 @@ class PokemonAPI extends RESTDataSource {
         return parseInt(nationalDexObj.entry_number);
     }
 
-    async getPokemonLocationObjects(pokemonId) {
+    async getPokemonEncounterLocationObj(pokemonId) {
         return await this.get(`/pokemon/${pokemonId}/encounters`);
     }
 
-    // can use location id to hit `/location-area/${id}` for Location type
-    async getPokemonLocationAreaId(locationObj) {
-        return parseUrl(locationObj.location_area.url);
+    async getLocationAreaIdsFromPokemonEncounterObj(pokemonId) {
+        const pokemonEncounterResponse = await this.get(
+            `/pokemon/${pokemonId}/encounters`
+        );
+
+        const locationAreaIds = pokemonEncounterResponse.map(locationArea =>
+            parseUrl(locationArea.location_area.url)
+        );
+
+        return locationAreaIds;
     }
 
-    async getPokemonLocationId(locationObj) {
-        const locationAreaId = await this.getPokemonLocationAreaId(locationObj);
+    async getLocationAreaIdsFromLocationEndpoint(locationId) {
+        const locationResponse = await this.get(`/location/${locationId}`);
 
+        const locationAreaIds = locationResponse.areas.map(area =>
+            parseUrl(area.url)
+        );
+
+        return locationAreaIds;
+    }
+
+    async getLocationIdFromLocationAreaEndpoint(locationAreaId) {
         const locationAreaResponse = await this.get(
             `/location-area/${locationAreaId}`
         );
@@ -338,50 +422,143 @@ class PokemonAPI extends RESTDataSource {
         return locationId;
     }
 
-    async getPokemonLocationName(locationObj) {
-        const locationId = await this.getPokemonLocationId(locationObj);
+    async getLocationName(locationId) {
         const locationResponse = await this.get(`/location/${locationId}`);
 
-        const allNames = locationResponse.names;
-        const englishName = allNames.find(name => name.language.name === "en")
-            .name;
-
-        return englishName;
+        return locationResponse.name;
     }
 
-    async getPokemonLocationRegion(locationObj) {
-        const locationId = await this.getPokemonLocationId(locationObj);
+    async getLocationRegionId(locationId) {
         const locationResponse = await this.get(`/location/${locationId}`);
-        const region = locationResponse.region.name;
 
-        return region;
+        const regionId = parseUrl(locationResponse.region.url);
+
+        return regionId;
     }
 
-    async getPokemonLocationGames(locationObj) {
-        const games = locationObj.version_details.map(
-            game => game.version.name
-        );
-
-        return games;
-    }
-
-    async getLocationPokemonEncounters(locationObj) {
-        let pokemonEncounters = [];
-
+    async getLocationAreaPokemon(locationAreaId) {
         const locationAreaResponse = await this.get(
-            locationObj.location_area.url
+            `/location-area/${locationAreaId}`
         );
 
-        const findablePokemon = locationAreaResponse.pokemon_encounters;
+        const pokemonIds = locationAreaResponse.pokemon_encounters.map(
+            pokemon => parseUrl(pokemon.pokemon.url)
+        );
 
-        if (findablePokemon.length) {
-            pokemonEncounters = findablePokemon.map(pokemon =>
-                parseUrl(pokemon.pokemon.url)
-            );
-        }
-
-        return pokemonEncounters;
+        return pokemonIds;
     }
+
+    async getLocationPokemonFromLocationAreas(locationId) {
+        const locationAreaIds = await this.getLocationAreaIdsFromLocationEndpoint(
+            locationId
+        );
+
+        // for each location area for this location, get all of the ids for all of the pokemon at each location area
+        const pokemonIdsPromise = await locationAreaIds.map(async id => {
+            const monIds = await this.getLocationAreaPokemon(id);
+            return monIds;
+        });
+        const pokemonIdsArrays = await Promise.all(pokemonIdsPromise);
+        const pokemonIds = pokemonIdsArrays.flat();
+
+        // gets rid of duplicates
+        const pokemonIdsSet = new Set(pokemonIds);
+
+        const deduplicatedIds = [...pokemonIdsSet];
+        return deduplicatedIds;
+    }
+
+    async getLocationGames(locationId) {
+        const locationAreaIds = await this.getLocationAreaIdsFromLocationEndpoint(
+            locationId
+        );
+
+        const gameIdsPromise = await locationAreaIds.map(async id => {
+            const locationAreaResp = await this.get(`/location-area/${id}`);
+
+            const gameIdsArray = locationAreaResp.encounter_method_rates.map(
+                version => {
+                    return version.version_details.map(game => {
+                        return parseUrl(game.version.url);
+                    });
+                }
+            );
+            return gameIdsArray.flat();
+        });
+
+        const gameIds = await Promise.all(gameIdsPromise);
+        const gameIdsFlattened = gameIds.flat();
+
+        // get rid of duplicates
+        const gameIdsSet = new Set(gameIdsFlattened);
+        return [...gameIdsSet];
+    }
+
+    // async getPokemonLocationObjects(pokemonId) {
+    //     return await this.get(`/pokemon/${pokemonId}/encounters`);
+    // }
+
+    // can use location id to hit `/location-area/${id}` for Location type
+    // async getPokemonLocationAreaId(locationObj) {
+    //     return parseUrl(locationObj.location_area.url);
+    // }
+
+    // async getPokemonLocationId(locationObj) {
+    //     const locationAreaId = await this.getPokemonLocationAreaId(locationObj);
+
+    //     const locationAreaResponse = await this.get(
+    //         `/location-area/${locationAreaId}`
+    //     );
+
+    //     const locationId = parseUrl(locationAreaResponse.location.url);
+
+    //     return locationId;
+    // }
+
+    // async getPokemonLocationName(locationObj) {
+    //     const locationId = await this.getPokemonLocationId(locationObj);
+    //     const locationResponse = await this.get(`/location/${locationId}`);
+
+    //     const allNames = locationResponse.names;
+    //     const englishName = allNames.find(name => name.language.name === "en")
+    //         .name;
+
+    //     return englishName;
+    // }
+
+    // async getPokemonLocationRegion(locationObj) {
+    //     const locationId = await this.getPokemonLocationId(locationObj);
+    //     const locationResponse = await this.get(`/location/${locationId}`);
+    //     const region = locationResponse.region.name;
+
+    //     return region;
+    // }
+
+    // async getPokemonLocationGames(locationObj) {
+    //     const games = locationObj.version_details.map(
+    //         game => game.version.name
+    //     );
+
+    //     return games;
+    // }
+
+    // async getLocationPokemonEncounters(locationObj) {
+    //     let pokemonEncounters = [];
+
+    //     const locationAreaResponse = await this.get(
+    //         locationObj.location_area.url
+    //     );
+
+    //     const findablePokemon = locationAreaResponse.pokemon_encounters;
+
+    //     if (findablePokemon.length) {
+    //         pokemonEncounters = findablePokemon.map(pokemon =>
+    //             parseUrl(pokemon.pokemon.url)
+    //         );
+    //     }
+
+    //     return pokemonEncounters;
+    // }
 
     async getAbilitiesIds(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
@@ -632,6 +809,62 @@ class PokemonAPI extends RESTDataSource {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
 
         return basicResponse.sprites;
+    }
+
+    async getRegionName(regionId) {
+        const regionResponse = await this.get(`/region/${regionId}`);
+
+        return regionResponse.name;
+    }
+
+    async getRegionLocations(regionId) {
+        const regionResponse = await this.get(`/region/${regionId}`);
+
+        const locationIds = regionResponse.locations.map(location =>
+            parseUrl(location.url)
+        );
+
+        return locationIds;
+    }
+
+    async getRegionGames(regionId) {
+        const regionResponse = await this.get(`/region/${regionId}`);
+
+        const gameIds = regionResponse.version_groups.map(game =>
+            parseUrl(game.url)
+        );
+
+        return gameIds;
+    }
+
+    async getGameName(gameId) {
+        const gameResponse = await this.get(`/version/${gameId}`);
+
+        return gameResponse.name;
+    }
+
+    async getGameVersionGroupId(gameId) {
+        const gameResponse = await this.get(`/version/${gameId}`);
+
+        const versionGroupId = parseUrl(gameResponse.version_group.url);
+
+        return versionGroupId;
+    }
+
+    async getGameGeneration(gameId) {
+        const gameResponse = await this.get(`/version-group/${gameId}`);
+
+        return gameResponse.generation.name;
+    }
+
+    async getGameRegions(gameId) {
+        const gameResponse = await this.get(`/version-group/${gameId}`);
+
+        const regionIds = gameResponse.regions.map(region =>
+            parseUrl(region.url)
+        );
+
+        return regionIds;
     }
 }
 

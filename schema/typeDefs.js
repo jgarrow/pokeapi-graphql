@@ -109,16 +109,37 @@ const typeDefs = gql`
     }
 
     type Location {
-        location_id: Int # for the /location-area/id endpoint
-        location_area_id: Int # for the /location/id endpoint
+        id: Int # for the /location-area/id endpoint
+        # location_area_id: Int # for the /location/id endpoint
         name: String
-        region: String
-        games: [String] # which game/version pokemon is found at this location
+        region: Region
+        games: [Game] # which game/version pokemon is found at this location
         pokemon: [Pokemon] # array of pokemon that can be found at this location
     }
 
+    type Region {
+        id: Int
+        name: String
+        games: [Game]
+        locations: [Location]
+    }
+
+    type Game {
+        id: Int
+        name: String
+        generation: String
+        regions: [Region]
+    }
+
     type Query {
-        allPokemon(start: Int): [Pokemon] # get range of pokemon starting from start variable
+        allPokemon(start: Int, end: Int): [Pokemon] # get range of pokemon starting from start variable
+        allAbilities(start: Int, end: Int): [Ability]
+        allTypes(start: Int, end: Int): [Type]
+        allEggGroups(start: Int, end: Int): [EggGroup]
+        allLocations(start: Int, end: Int): [Location]
+        allMoves(start: Int, end: Int): [Move]
+        allRegions(start: Int, end: Int): [Region]
+        allGames(start: Int, end: Int): [Game]
         # game(name: String!): [Pokemon] # get pokemon from a specific game
         # generation(generationNumber: Int!): [Pokemon] # get pokemon from specific generation regardless of game
         pokemon(number: Int!): Pokemon
@@ -127,6 +148,8 @@ const typeDefs = gql`
         eggGroup(id: Int!): EggGroup
         location(id: Int!): Location
         move(id: Int!): Move
+        region(id: Int!): Region
+        game(id: Int): Game
     }
 `;
 

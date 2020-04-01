@@ -3,21 +3,50 @@ const baseUrl = `https://pokeapi.co/api/v2`;
 
 const resolvers = {
     Query: {
-        allPokemon: (parent, args) => {
-            return fetch(
-                `${baseUrl}/pokemon?offset=${args.start}&limit=20`
-            ).then(res => res.json());
+        allPokemon: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllPokemon(args.start, args.end);
         },
+        allTypes: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllTypes(args.start, args.end);
+        },
+        allMoves: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllMoves(args.start, args.end);
+        },
+        allAbilities: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllAbilities(args.start, args.end);
+        },
+        allEggGroups: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllEggGroups(args.start, args.end);
+        },
+        allRegions: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllRegions(args.start, args.end);
+        },
+        allGames: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllGames(args.start, args.end);
+        },
+
         pokemon: (parent, args, { dataSources }) => {
             return args.number;
         },
         move: (parent, args, { dataSources }) => {
-            return args.id;
+            return { moveId: args.id };
         },
         ability: (parent, args, { dataSources }) => {
-            return args.id;
+            return { abilityId: args.id };
         },
         location: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        type: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        eggGroup: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        region: (parent, args, { dataSources }) => {
+            return args.id;
+        },
+        game: (parent, args, { dataSources }) => {
             return args.id;
         }
     },
@@ -55,10 +84,32 @@ const resolvers = {
         evolution_trigger: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEvolutionTrigger(parent);
         },
-        locations: (parent, args, { dataSources }) => {
+        locations: async (parent, args, { dataSources }) => {
             // return dataSources.pokemonAPI.getPokemonLocationIds(parent);
             // return {pokemonid: parent, locationNames: dataSources.pokemonAPI.getPokemonLocationNames(parent)}
-            return dataSources.pokemonAPI.getPokemonLocationObjects(parent);
+            const locationAreaIds = await dataSources.pokemonAPI.getLocationAreaIdsFromPokemonEncounterObj(
+                parent
+            );
+
+            const locationIds = locationAreaIds.map(async locAreaId => {
+                await dataSources.pokemonAPI.getLocationIdFromLocationAreaEndpoint(
+                    locAreaId
+                );
+            });
+
+            // gets rid of duplicates
+            const locationIdsSet = new Set(locationIds);
+
+            return [...locationIdsSet];
+
+            // const pokemonIdandLocationObjs = locationObjects.map(location => {
+            //     return {
+            //         pokemonId: parent,
+            //         locationObj: location
+            //     };
+            // });
+            // console.log("pokemonIdandLocationObjs:", pokemonIdandLocationObjs);
+            // return pokemonIdandLocationObjs;
         },
         abilities: async (parent, args, { dataSources }) => {
             const abilityIds = await dataSources.pokemonAPI.getAbilitiesIds(
@@ -96,23 +147,25 @@ const resolvers = {
         }
     },
     Location: {
-        location_id: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getPokemonLocationId(parent);
-        },
-        location_area_id: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getPokemonLocationAreaId(parent);
-        },
+        id: (parent, args, { dataSources }) => parent,
+        // location_area_id: (parent, args, { dataSources }) => {
+        //     return dataSources.pokemonAPI.getPokemonLocationAreaId(
+        //         parent.locationObj
+        //     );
+        // },
         name: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getPokemonLocationName(parent);
+            return dataSources.pokemonAPI.getLocationName(parent);
         },
         region: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getPokemonLocationRegion(parent);
+            return dataSources.pokemonAPI.getLocationRegionId(parent);
         },
         games: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getPokemonLocationGames(parent);
+            return dataSources.pokemonAPI.getLocationGames(parent);
         },
         pokemon: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getLocationPokemonEncounters(parent);
+            return dataSources.pokemonAPI.getLocationPokemonFromLocationAreas(
+                parent
+            );
         }
     },
     Ability: {
@@ -180,7 +233,7 @@ const resolvers = {
         }
     },
     Move: {
-        id: (parent, args, { dataSources }) => parent,
+        id: (parent, args, { dataSources }) => parent.moveId,
         name: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getMoveName(parent.moveId);
         },
@@ -207,6 +260,38 @@ const resolvers = {
                 parent.pokemonId,
                 parent.moveId
             );
+        }
+    },
+    Region: {
+        id: (parent, args, { dataSources }) => parent,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getRegionName(parent);
+        },
+        games: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getRegionGames(parent);
+        },
+        locations: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getRegionLocations(parent);
+        }
+    },
+    Game: {
+        id: (parent, args, { dataSources }) => parent,
+        name: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getGameName(parent);
+        },
+        generation: async (parent, args, { dataSources }) => {
+            const gameId = await dataSources.pokemonAPI.getGameVersionGroupId(
+                parent
+            );
+
+            return dataSources.pokemonAPI.getGameGeneration(gameId);
+        },
+        regions: async (parent, args, { dataSources }) => {
+            const gameId = await dataSources.pokemonAPI.getGameVersionGroupId(
+                parent
+            );
+
+            return dataSources.pokemonAPI.getGameRegions(gameId);
         }
     }
 };
