@@ -87,12 +87,13 @@ const resolvers = {
         locations: async (parent, args, { dataSources }) => {
             // return dataSources.pokemonAPI.getPokemonLocationIds(parent);
             // return {pokemonid: parent, locationNames: dataSources.pokemonAPI.getPokemonLocationNames(parent)}
+            console.log("here");
             const locationAreaIds = await dataSources.pokemonAPI.getLocationAreaIdsFromPokemonEncounterObj(
                 parent
             );
 
             const locationIds = locationAreaIds.map(async locAreaId => {
-                await dataSources.pokemonAPI.getLocationIdFromLocationAreaEndpoint(
+                return await dataSources.pokemonAPI.getLocationIdFromLocationAreaEndpoint(
                     locAreaId
                 );
             });
@@ -144,6 +145,12 @@ const resolvers = {
         },
         sprites: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonSprites(parent);
+        },
+        games: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonGames(parent);
+        },
+        generation: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getPokemonGeneration(parent);
         }
     },
     Location: {
@@ -154,6 +161,7 @@ const resolvers = {
         //     );
         // },
         name: (parent, args, { dataSources }) => {
+            console.log("parent: ", parent);
             return dataSources.pokemonAPI.getLocationName(parent);
         },
         region: (parent, args, { dataSources }) => {

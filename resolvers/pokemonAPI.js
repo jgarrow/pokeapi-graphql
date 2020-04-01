@@ -248,6 +248,12 @@ class PokemonAPI extends RESTDataSource {
         };
     }
 
+    async getPokemonGeneration(pokemonId) {
+        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+
+        return speciesResponse.generation.name;
+    }
+
     async getWhoPokemonEvolvesTo(id) {
         // need to get name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
@@ -384,6 +390,16 @@ class PokemonAPI extends RESTDataSource {
         );
 
         return parseInt(nationalDexObj.entry_number);
+    }
+
+    async getPokemonGames(pokemonId) {
+        const pokemonResponse = await this.get(`/pokemon/${pokemonId}`);
+
+        const gameIds = pokemonResponse.game_indices.map(game =>
+            parseUrl(game.version.url)
+        );
+
+        return gameIds;
     }
 
     async getPokemonEncounterLocationObj(pokemonId) {

@@ -22,6 +22,8 @@ const typeDefs = gql`
         evolution_criteria: [EvolutionCriteria]
         evolution_trigger: String
         evolves_to: [Pokemon]
+        games: [Game]
+        generation: String
     }
 
     type Type { # Pokemon type (i.e. Grass, Electric, Water, etc)
