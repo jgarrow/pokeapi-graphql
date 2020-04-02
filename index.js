@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { ApolloServer } = require("apollo-server");
 const { typeDefs } = require("./schema/typeDefs");
 const { PokemonAPI } = require("./resolvers/pokemonAPI");
@@ -14,6 +16,6 @@ const server = new ApolloServer({
     context: () => {}
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
     console.log(`🚀  Server ready at ${url}`);
 });
