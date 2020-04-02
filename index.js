@@ -13,7 +13,9 @@ const server = new ApolloServer({
             pokemonAPI: new PokemonAPI()
         };
     },
-    context: () => {}
+    context: () => {},
+    introspection: true,
+    playground: true
 });
 
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
