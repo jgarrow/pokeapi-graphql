@@ -124,8 +124,14 @@ const typeDefs = gql`
         regions: [Region]
     }
 
+    type NameAndId {
+        id: Int
+        name: String
+    }
+
     type Query {
-        allPokemon(start: Int, end: Int): [Pokemon] # get range of pokemon starting from start variable
+        allPokemonNamesAndIds(start: Int, end: Int): [NameAndId]
+        allPokemonObjects(start: Int, end: Int): [Pokemon] # get range of pokemon starting from start variable
         allAbilities(start: Int, end: Int): [Ability]
         allTypes(start: Int, end: Int): [Type]
         allEggGroups(start: Int, end: Int): [EggGroup]

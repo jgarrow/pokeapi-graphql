@@ -7,7 +7,23 @@ class PokemonAPI extends RESTDataSource {
         this.baseURL = "https://pokeapi.co/api/v2";
     }
 
-    async getAllPokemon(start = 0, end = 964) {
+    async getallPokemonNamesAndIds(start = 0, end = 964) {
+        const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
+
+        const namesAndIds = response.results.map(pokemon => {
+            const id = parseUrl(pokemon.url);
+            const name = pokemon.name;
+            return {
+                id,
+                name
+            };
+        });
+
+        return namesAndIds;
+    }
+
+    async getAllPokemonIds(start = 0, end = 964) {
+        console.log(`pokemon?offset=${start}&limit=${end}`);
         const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
 
         const pokemonIds = response.results.map(pokemon =>

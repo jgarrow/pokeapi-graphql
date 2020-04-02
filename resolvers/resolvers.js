@@ -1,7 +1,16 @@
 const resolvers = {
     Query: {
-        allPokemon: (parent, args, { dataSources }) => {
-            return dataSources.pokemonAPI.getAllPokemon(args.start, args.end);
+        allPokemonNamesAndIds: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getallPokemonNamesAndIds(
+                args.start,
+                args.end
+            );
+        },
+        allPokemonObjects: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getAllPokemonIds(
+                args.start,
+                args.end
+            );
         },
         allTypes: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getAllTypes(args.start, args.end);
@@ -279,6 +288,10 @@ const resolvers = {
 
             return dataSources.pokemonAPI.getGameRegions(gameId);
         }
+    },
+    NameAndId: {
+        id: (parent, args, { dataSources }) => parent.id,
+        name: (parent, args, { dataSources }) => parent.name
     }
 };
 
