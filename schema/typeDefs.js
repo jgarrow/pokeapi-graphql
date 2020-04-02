@@ -5,16 +5,15 @@ const typeDefs = gql`
         id: Int # want the number that is used for the pokemon endpoint
         name: String
         nat_dex_num: Int
-        main_image: String #image src url
         types: [Type] # array of Type objects
-        height: Int
-        weight: Int
+        height: Int # height in decimeters
+        weight: Int # weight in hectograms
         gender: String # if available
         category: String # if available (the puppy pokemon)
         egg_groups: [EggGroup]
         abilities: [Ability] # array of Ability objects
         sprites: Sprites # array of Sprite objects
-        base_stats: Stats # array of Stat objects
+        base_stats: Stats
         pokedex_entries: [DexEntry] # array of DexEntry objects
         moves: [Move] # array of Move objects
         locations: [Location] # array of Location objects
@@ -68,14 +67,6 @@ const typeDefs = gql`
         value: String # thunder-stone
     }
 
-    type EvolutionPokemon {
-        name: String
-        sprite: String # image src url
-        evolution_method: String # ex. 'level-up' , 'item'
-        evolution_trigger: String # ex. '16' , 'water-stone'
-        evolution_tier: Int # 1, 2, or 3
-    }
-
     type Stats {
         hp: Int
         attack: Int
@@ -107,7 +98,7 @@ const typeDefs = gql`
     type MoveLearnMethod {
         method: String
         level_learned_at: Int
-        game: String
+        games: [Game]
     }
 
     type Location {

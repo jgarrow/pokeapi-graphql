@@ -85,9 +85,6 @@ const resolvers = {
             return dataSources.pokemonAPI.getEvolutionTrigger(parent);
         },
         locations: async (parent, args, { dataSources }) => {
-            // return dataSources.pokemonAPI.getPokemonLocationIds(parent);
-            // return {pokemonid: parent, locationNames: dataSources.pokemonAPI.getPokemonLocationNames(parent)}
-            console.log("here");
             const locationAreaIds = await dataSources.pokemonAPI.getLocationAreaIdsFromPokemonEncounterObj(
                 parent
             );
@@ -102,15 +99,6 @@ const resolvers = {
             const locationIdsSet = new Set(locationIds);
 
             return [...locationIdsSet];
-
-            // const pokemonIdandLocationObjs = locationObjects.map(location => {
-            //     return {
-            //         pokemonId: parent,
-            //         locationObj: location
-            //     };
-            // });
-            // console.log("pokemonIdandLocationObjs:", pokemonIdandLocationObjs);
-            // return pokemonIdandLocationObjs;
         },
         abilities: async (parent, args, { dataSources }) => {
             const abilityIds = await dataSources.pokemonAPI.getAbilitiesIds(
@@ -155,13 +143,7 @@ const resolvers = {
     },
     Location: {
         id: (parent, args, { dataSources }) => parent,
-        // location_area_id: (parent, args, { dataSources }) => {
-        //     return dataSources.pokemonAPI.getPokemonLocationAreaId(
-        //         parent.locationObj
-        //     );
-        // },
         name: (parent, args, { dataSources }) => {
-            console.log("parent: ", parent);
             return dataSources.pokemonAPI.getLocationName(parent);
         },
         region: (parent, args, { dataSources }) => {
