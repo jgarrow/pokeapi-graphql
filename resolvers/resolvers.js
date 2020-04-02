@@ -1,6 +1,3 @@
-const fetch = require("node-fetch");
-const baseUrl = `https://pokeapi.co/api/v2`;
-
 const resolvers = {
     Query: {
         allPokemon: (parent, args, { dataSources }) => {
@@ -24,7 +21,6 @@ const resolvers = {
         allGames: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getAllGames(args.start, args.end);
         },
-
         pokemon: (parent, args, { dataSources }) => {
             return args.number;
         },
