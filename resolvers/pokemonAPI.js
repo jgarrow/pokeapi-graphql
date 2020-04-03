@@ -129,7 +129,7 @@ class PokemonAPI extends RESTDataSource {
                 .flat();
         }
 
-        return pokemonIdsArray;
+        return pokemonIdsArray ? pokemonIdsArray : null;
     }
 
     async getEvolvesFromPokemonId(currentPokemonName, evolutionChainObj) {
@@ -161,7 +161,7 @@ class PokemonAPI extends RESTDataSource {
             pokemonId = parseUrl(tierII.species.url);
         }
 
-        return pokemonId;
+        return pokemonId ? pokemonId : null;
     }
 
     async getPokemonId(id) {
@@ -189,7 +189,7 @@ class PokemonAPI extends RESTDataSource {
         const stats = basicResponse.stats;
         const attack = stats.find(stat => stat.stat.name === "attack");
 
-        return attack.base_stat;
+        return attack.base_stat ? attack.base_stat : null;
     }
 
     async getDefenseStat(id) {
@@ -197,7 +197,7 @@ class PokemonAPI extends RESTDataSource {
         const stats = basicResponse.stats;
         const defense = stats.find(stat => stat.stat.name === "defense");
 
-        return defense.base_stat;
+        return defense.base_stat ? defense.base_stat : null;
     }
 
     async getSpeedStat(id) {
@@ -205,7 +205,7 @@ class PokemonAPI extends RESTDataSource {
         const stats = basicResponse.stats;
         const speed = stats.find(stat => stat.stat.name === "speed");
 
-        return speed.base_stat;
+        return speed.base_stat ? speed.base_stat : null;
     }
 
     async getSpecialAttackStat(id) {
@@ -215,7 +215,7 @@ class PokemonAPI extends RESTDataSource {
             stat => stat.stat.name === "special-attack"
         );
 
-        return specialAttack.base_stat;
+        return specialAttack.base_stat ? specialAttack.base_stat : null;
     }
 
     async getSpecialDefenseStat(id) {
@@ -225,7 +225,7 @@ class PokemonAPI extends RESTDataSource {
             stat => stat.stat.name === "special-defense"
         );
 
-        return specialDefense.base_stat;
+        return specialDefense.base_stat ? specialDefense.base_stat : null;
     }
 
     async getHpStat(id) {
@@ -233,7 +233,7 @@ class PokemonAPI extends RESTDataSource {
         const stats = basicResponse.stats;
         const hp = stats.find(stat => stat.stat.name === "hp");
 
-        return hp.base_stat;
+        return hp.base_stat ? hp.base_stat : null;
     }
 
     async getPokemonBaseStats(id) {
@@ -258,7 +258,9 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonGeneration(pokemonId) {
         const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
 
-        return speciesResponse.generation.name;
+        return speciesResponse.generation.name
+            ? speciesResponse.generation.name
+            : null;
     }
 
     async getWhoPokemonEvolvesTo(id) {
@@ -333,7 +335,7 @@ class PokemonAPI extends RESTDataSource {
                 .flat();
         }
 
-        return evolved_at_criteria;
+        return evolved_at_criteria ? evolved_at_criteria : null;
     }
 
     async getEvolutionTrigger(id) {
@@ -361,11 +363,14 @@ class PokemonAPI extends RESTDataSource {
         });
 
         // trigger is the same regardless of if there is more than one object in 'evolution_details'
-        if (currentPokemon) {
-            return currentPokemon.evolution_details[0].trigger.name;
-        } else {
-            return null;
-        }
+        return currentPokemon
+            ? currentPokemon.evolution_details[0].trigger.name
+            : null;
+        // if (currentPokemon) {
+        //     return currentPokemon.evolution_details[0].trigger.name;
+        // } else {
+        //     return null;
+        // }
     }
 
     async getWhoPokemonEvolvesFrom(id) {
@@ -396,7 +401,7 @@ class PokemonAPI extends RESTDataSource {
             pokedex => pokedex.pokedex.name === "national"
         );
 
-        return parseInt(nationalDexObj.entry_number);
+        return nationalDexObj ? parseInt(nationalDexObj.entry_number) : null;
     }
 
     async getPokemonGames(pokemonId) {
@@ -406,7 +411,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(game.version.url)
         );
 
-        return gameIds;
+        return gameIds ? gameIds : null;
     }
 
     async getPokemonEncounterLocationObj(pokemonId) {
@@ -422,7 +427,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(locationArea.location_area.url)
         );
 
-        return locationAreaIds;
+        return locationAreaIds ? locationAreaIds : null;
     }
 
     async getLocationAreaIdsFromLocationEndpoint(locationId) {
@@ -432,7 +437,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(area.url)
         );
 
-        return locationAreaIds;
+        return locationAreaIds ? locationAreaIds : null;
     }
 
     async getLocationIdFromLocationAreaEndpoint(locationAreaId) {
@@ -442,13 +447,13 @@ class PokemonAPI extends RESTDataSource {
 
         const locationId = parseUrl(locationAreaResponse.location.url);
 
-        return locationId;
+        return locationId ? locationId : null;
     }
 
     async getLocationName(locationId) {
         const locationResponse = await this.get(`/location/${locationId}`);
 
-        return locationResponse.name;
+        return locationResponse.name ? locationResponse.name : null;
     }
 
     async getLocationRegionId(locationId) {
@@ -456,7 +461,7 @@ class PokemonAPI extends RESTDataSource {
 
         const regionId = parseUrl(locationResponse.region.url);
 
-        return regionId;
+        return regionId ? regionId : null;
     }
 
     async getLocationAreaPokemon(locationAreaId) {
@@ -468,7 +473,7 @@ class PokemonAPI extends RESTDataSource {
             pokemon => parseUrl(pokemon.pokemon.url)
         );
 
-        return pokemonIds;
+        return pokemonIds ? pokemonIds : null;
     }
 
     async getLocationPokemonFromLocationAreas(locationId) {
@@ -488,7 +493,7 @@ class PokemonAPI extends RESTDataSource {
         const pokemonIdsSet = new Set(pokemonIds);
 
         const deduplicatedIds = [...pokemonIdsSet];
-        return deduplicatedIds;
+        return deduplicatedIds ? deduplicatedIds : null;
     }
 
     async getLocationGames(locationId) {
@@ -514,7 +519,7 @@ class PokemonAPI extends RESTDataSource {
 
         // get rid of duplicates
         const gameIdsSet = new Set(gameIdsFlattened);
-        return [...gameIdsSet];
+        return [...gameIdsSet] ? [...gameIdsSet] : null;
     }
 
     async getAbilitiesIds(id) {
@@ -524,7 +529,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(ability.ability.url)
         );
 
-        return abilityIds;
+        return abilityIds ? abilityIds : null;
     }
 
     async getAbilityName(abilityId) {
@@ -532,7 +537,7 @@ class PokemonAPI extends RESTDataSource {
 
         const name = abilityResponse.name;
 
-        return name;
+        return name ? name : null;
     }
 
     async getAbilityEffects(abilityId) {
@@ -542,7 +547,7 @@ class PokemonAPI extends RESTDataSource {
             effect => effect.effect
         );
 
-        return effects;
+        return effects ? effects : null;
     }
 
     async getAbilityIsHidden(pokemonId, abilityId) {
@@ -552,7 +557,7 @@ class PokemonAPI extends RESTDataSource {
             ability => parseUrl(ability.ability.url) === abilityId
         );
 
-        return abilityObj.is_hidden;
+        return abilityObj.is_hidden ? abilityObj.is_hidden : null;
     }
 
     async getPokemonThatCanHaveAbility(abilityId) {
@@ -562,7 +567,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(pokemon.pokemon.url)
         );
 
-        return pokemonList;
+        return pokemonList ? pokemonList : null;
     }
 
     async getPokemonPokedexEntries(pokemonId) {
@@ -578,27 +583,27 @@ class PokemonAPI extends RESTDataSource {
             entry.flavor_text = entry.flavor_text.replace(/\s/gm, " ");
         });
 
-        return pokedexEntries;
+        return pokedexEntries ? pokedexEntries : null;
     }
 
     async getPokedexEntryDescription(entryObj) {
-        return entryObj.flavor_text;
+        return entryObj.flavor_text ? entryObj.flavor_text : null;
     }
 
     async getPokedexEntryVersion(entryObj) {
-        return entryObj.version.name;
+        return entryObj.version.name ? entryObj.version.name : null;
     }
 
     async getPokemonTypeIds(pokemonId) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
         const types = basicResponse.types;
         const typeIds = types.map(type => parseUrl(type.type.url));
-        return typeIds;
+        return typeIds ? typeIds : null;
     }
 
     async getPokemonTypeName(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
-        return typeResponse.name;
+        return typeResponse.name ? typeResponse.name : null;
     }
 
     async getTypeDoubleDamageFrom(typeId) {
@@ -606,7 +611,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.double_damage_from;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds;
+        return typeIds ? typeIds : null;
     }
 
     async getTypeDoubleDamageTo(typeId) {
@@ -614,7 +619,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.double_damage_to;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds;
+        return typeIds ? typeIds : null;
     }
 
     async getTypeHalfDamageFrom(typeId) {
@@ -622,7 +627,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.half_damage_from;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds;
+        return typeIds ? typeIds : null;
     }
 
     async getTypeHalfDamageTo(typeId) {
@@ -630,7 +635,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.half_damage_to;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds;
+        return typeIds ? typeIds : null;
     }
 
     async getTypeNoDamageFrom(typeId) {
@@ -638,7 +643,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.no_damage_from;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds.length ? typeIds : null;
+        return typeIds && typeIds.length ? typeIds : null;
     }
 
     async getTypeNoDamageTo(typeId) {
@@ -646,7 +651,7 @@ class PokemonAPI extends RESTDataSource {
         const types = typeResponse.damage_relations.no_damage_to;
         const typeIds = types.map(type => parseUrl(type.url));
 
-        return typeIds.length ? typeIds : null;
+        return typeIds && typeIds.length ? typeIds : null;
     }
 
     async getPokemonOfType(typeId) {
@@ -656,7 +661,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(pokemon.pokemon.url)
         );
 
-        return pokemonIds;
+        return pokemonIds ? pokemonIds : null;
     }
 
     async getEggGroupIds(pokemonId) {
@@ -664,13 +669,13 @@ class PokemonAPI extends RESTDataSource {
         const eggGroups = speciesResponse.egg_groups;
         const eggGroupIds = eggGroups.map(eggGroup => parseUrl(eggGroup.url));
 
-        return eggGroupIds;
+        return eggGroupIds ? eggGroupIds : null;
     }
 
     async getEggGroupName(eggGroupId) {
         const eggGroupResponse = await this.get(`/egg-group/${eggGroupId}`);
 
-        return eggGroupResponse.name;
+        return eggGroupResponse.name ? eggGroupResponse.name : null;
     }
 
     async getEggGroupPokemonIds(eggGroupId) {
@@ -679,7 +684,7 @@ class PokemonAPI extends RESTDataSource {
         const pokemon = eggGroupResponse.pokemon_species;
         const pokemonIds = pokemon.map(pokemon => parseUrl(pokemon.url));
 
-        return pokemonIds;
+        return pokemonIds ? pokemonIds : null;
     }
 
     async getMoveIds(pokemonId) {
@@ -688,47 +693,47 @@ class PokemonAPI extends RESTDataSource {
         const moves = basicResponse.moves;
         const moveIds = moves.map(move => parseUrl(move.move.url));
 
-        return moveIds;
+        return moveIds ? moveIds : null;
     }
 
     async getMoveName(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
 
-        return moveResponse.name;
+        return moveResponse.name ? moveResponse.name : null;
     }
 
     async getMoveTypeId(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
 
         const moveTypeId = parseUrl(moveResponse.type.url);
-        return moveTypeId;
+        return moveTypeId ? moveTypeId : null;
     }
 
     // special or physical
     async getMoveDamageClass(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
         const damageClass = moveResponse.damage_class.name;
-        return damageClass;
+        return damageClass ? damageClass : null;
     }
 
     async getMovePower(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
-        return moveResponse.power;
+        return moveResponse.power ? moveResponse.power : null;
     }
 
     async getMovePp(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
-        return moveResponse.pp;
+        return moveResponse.pp ? moveResponse.pp : null;
     }
 
     async getMoveAccuracy(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
-        return moveResponse.accuracy;
+        return moveResponse.accuracy ? moveResponse.accuracy : null;
     }
 
     async getMoveEffectChance(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
-        return moveResponse.effect_chance;
+        return moveResponse.effect_chance ? moveResponse.effect_chance : null;
     }
 
     async getMoveEffects(moveId) {
@@ -739,7 +744,7 @@ class PokemonAPI extends RESTDataSource {
             return effect.effect.replace("$effect_chance", moveEffectChance);
         });
 
-        return moveEffects;
+        return moveEffects ? moveEffects : null;
     }
 
     async getMoveLearnMethodGameIds(versionGroupId) {
@@ -751,7 +756,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(version.url)
         );
 
-        return gameIds;
+        return gameIds ? gameIds : null;
     }
 
     async getMoveLearnMethodNames(pokemonId, moveId) {
@@ -766,7 +771,7 @@ class PokemonAPI extends RESTDataSource {
             game => game.move_learn_method.name
         );
 
-        return methodNames;
+        return methodNames ? methodNames : null;
     }
 
     async getMoveLearnMethods(pokemonId, moveId) {
@@ -794,19 +799,19 @@ class PokemonAPI extends RESTDataSource {
             }
         );
 
-        return learnMethods;
+        return learnMethods ? learnMethods : null;
     }
 
     async getPokemonSprites(pokemonId) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
 
-        return basicResponse.sprites;
+        return basicResponse.sprites ? basicResponse.sprites : null;
     }
 
     async getRegionName(regionId) {
         const regionResponse = await this.get(`/region/${regionId}`);
 
-        return regionResponse.name;
+        return regionResponse.name ? regionResponse.name : null;
     }
 
     async getRegionLocations(regionId) {
@@ -816,7 +821,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(location.url)
         );
 
-        return locationIds;
+        return locationIds ? locationIds : null;
     }
 
     async getRegionGames(regionId) {
@@ -826,13 +831,13 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(game.url)
         );
 
-        return gameIds;
+        return gameIds ? gameIds : null;
     }
 
     async getGameName(gameId) {
         const gameResponse = await this.get(`/version/${gameId}`);
 
-        return gameResponse.name;
+        return gameResponse.name ? gameResponse.name : null;
     }
 
     async getGameVersionGroupId(gameId) {
@@ -840,13 +845,15 @@ class PokemonAPI extends RESTDataSource {
 
         const versionGroupId = parseUrl(gameResponse.version_group.url);
 
-        return versionGroupId;
+        return versionGroupId ? versionGroupId : null;
     }
 
     async getGameGeneration(gameId) {
         const gameResponse = await this.get(`/version-group/${gameId}`);
 
-        return gameResponse.generation.name;
+        return gameResponse.generation.name
+            ? gameResponse.generation.name
+            : null;
     }
 
     async getGameRegions(gameId) {
@@ -856,7 +863,7 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(region.url)
         );
 
-        return regionIds;
+        return regionIds ? regionIds : null;
     }
 }
 

@@ -8,8 +8,8 @@ const typeDefs = gql`
         types: [Type] # array of Type objects
         height: Int # height in decimeters
         weight: Int # weight in hectograms
-        gender: String # if available
-        category: String # if available (the puppy pokemon)
+        # gender: String # if available
+        # category: String # if available (the puppy pokemon)
         egg_groups: [EggGroup]
         abilities: [Ability] # array of Ability objects
         sprites: Sprites # array of Sprite objects
