@@ -10,12 +10,12 @@ class PokemonAPI extends RESTDataSource {
     async getallPokemonNamesAndIds(start = 0, end = 964) {
         const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
 
-        const namesAndIds = response.results.map(pokemon => {
+        const namesAndIds = response.results.map((pokemon) => {
             const id = parseUrl(pokemon.url);
             const name = pokemon.name;
             return {
                 id,
-                name
+                name,
             };
         });
 
@@ -26,7 +26,7 @@ class PokemonAPI extends RESTDataSource {
         console.log(`pokemon?offset=${start}&limit=${end}`);
         const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
 
-        const pokemonIds = response.results.map(pokemon =>
+        const pokemonIds = response.results.map((pokemon) =>
             parseUrl(pokemon.url)
         );
 
@@ -36,7 +36,7 @@ class PokemonAPI extends RESTDataSource {
     async getAllTypes(start = 0, end = 20) {
         const response = await this.get(`type?offset=${start}&limit=${end}`);
 
-        const typeIds = response.results.map(type => parseUrl(type.url));
+        const typeIds = response.results.map((type) => parseUrl(type.url));
 
         return typeIds;
     }
@@ -44,9 +44,9 @@ class PokemonAPI extends RESTDataSource {
     async getAllMoves(start = 0, end = 746) {
         const response = await this.get(`move?offset=${start}&limit=${end}`);
 
-        const moveIds = response.results.map(move => {
+        const moveIds = response.results.map((move) => {
             return {
-                moveId: parseUrl(move.url)
+                moveId: parseUrl(move.url),
             };
         });
 
@@ -56,7 +56,7 @@ class PokemonAPI extends RESTDataSource {
     async getAllAbilities(start = 0, end = 293) {
         const response = await this.get(`ability?offset=${start}&limit=${end}`);
 
-        const abilityIds = response.results.map(ability => {
+        const abilityIds = response.results.map((ability) => {
             return { abilityId: parseUrl(ability.url) };
         });
 
@@ -68,7 +68,7 @@ class PokemonAPI extends RESTDataSource {
             `egg-group?offset=${start}&limit=${end}`
         );
 
-        const eggGroupdIds = response.results.map(eggGroup =>
+        const eggGroupdIds = response.results.map((eggGroup) =>
             parseUrl(eggGroup.url)
         );
 
@@ -78,7 +78,9 @@ class PokemonAPI extends RESTDataSource {
     async getAllRegions(start = 0, end = 7) {
         const response = await this.get(`region?offset=${start}&limit=${end}`);
 
-        const regionIds = response.results.map(region => parseUrl(region.url));
+        const regionIds = response.results.map((region) =>
+            parseUrl(region.url)
+        );
 
         return regionIds;
     }
@@ -86,7 +88,7 @@ class PokemonAPI extends RESTDataSource {
     async getAllGames(start = 0, end = 30) {
         const response = await this.get(`/version?offset=${start}&end=${end}`);
 
-        const gameIds = response.results.map(game => parseUrl(game.url));
+        const gameIds = response.results.map((game) => parseUrl(game.url));
 
         return gameIds;
     }
@@ -98,7 +100,7 @@ class PokemonAPI extends RESTDataSource {
 
         // tier II is an array because tier I can evolve into multiple things (i.e. Eevee)
         const tierIINamesArray = evolutionChainObj.chain.evolves_to.map(
-            pokemon => pokemon.species.name
+            (pokemon) => pokemon.species.name
         );
 
         let pokemonIdsArray = [];
@@ -106,7 +108,7 @@ class PokemonAPI extends RESTDataSource {
         // if the currentPokemonName is a tier I evolution
         if (currentPokemonName === tierIName) {
             pokemonIdsArray = evolutionChainObj.chain.evolves_to.map(
-                pokemon => {
+                (pokemon) => {
                     const pokemonId = parseUrl(pokemon.species.url);
 
                     return pokemonId;
@@ -115,9 +117,9 @@ class PokemonAPI extends RESTDataSource {
             // if the currentPokemonName is a tier II evolution
         } else if (tierIINamesArray.includes(currentPokemonName)) {
             pokemonIdsArray = evolutionChainObj.chain.evolves_to
-                .map(evolutionTierIIObj => {
+                .map((evolutionTierIIObj) => {
                     return evolutionTierIIObj.evolves_to
-                        .map(evolutionTierIIIObj => {
+                        .map((evolutionTierIIIObj) => {
                             const pokemonId = parseUrl(
                                 evolutionTierIIIObj.species.url
                             );
@@ -137,14 +139,14 @@ class PokemonAPI extends RESTDataSource {
 
         // don't need tier I pokemon because they can't evolve from something
         const tierIINamesArray = evolutionChainObj.chain.evolves_to.map(
-            pokemon => pokemon.species.name
+            (pokemon) => pokemon.species.name
         );
 
         let tierII = null;
 
-        evolutionChainObj.chain.evolves_to.forEach(tierIIPokemon => {
+        evolutionChainObj.chain.evolves_to.forEach((tierIIPokemon) => {
             const tierIIIPokemons = tierIIPokemon.evolves_to.map(
-                tierIIIPokemon => tierIIIPokemon.species.name
+                (tierIIIPokemon) => tierIIIPokemon.species.name
             );
 
             if (tierIIIPokemons.includes(currentPokemonName)) {
@@ -169,6 +171,13 @@ class PokemonAPI extends RESTDataSource {
         return basicResponse.id;
     }
 
+    async getPokemonSpeciesId(pokemonId) {
+        const basicResponse = await this.get(`/pokemon/${id}`);
+        const speciesId = parseUrl(basicResponse.species.url);
+
+        return speciesId;
+    }
+
     async getPokemonName(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         return basicResponse.name;
@@ -187,7 +196,7 @@ class PokemonAPI extends RESTDataSource {
     async getAttackStat(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
-        const attack = stats.find(stat => stat.stat.name === "attack");
+        const attack = stats.find((stat) => stat.stat.name === "attack");
 
         return attack.base_stat ? attack.base_stat : null;
     }
@@ -195,7 +204,7 @@ class PokemonAPI extends RESTDataSource {
     async getDefenseStat(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
-        const defense = stats.find(stat => stat.stat.name === "defense");
+        const defense = stats.find((stat) => stat.stat.name === "defense");
 
         return defense.base_stat ? defense.base_stat : null;
     }
@@ -203,7 +212,7 @@ class PokemonAPI extends RESTDataSource {
     async getSpeedStat(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
-        const speed = stats.find(stat => stat.stat.name === "speed");
+        const speed = stats.find((stat) => stat.stat.name === "speed");
 
         return speed.base_stat ? speed.base_stat : null;
     }
@@ -212,7 +221,7 @@ class PokemonAPI extends RESTDataSource {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
         const specialAttack = stats.find(
-            stat => stat.stat.name === "special-attack"
+            (stat) => stat.stat.name === "special-attack"
         );
 
         return specialAttack.base_stat ? specialAttack.base_stat : null;
@@ -222,7 +231,7 @@ class PokemonAPI extends RESTDataSource {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
         const specialDefense = stats.find(
-            stat => stat.stat.name === "special-defense"
+            (stat) => stat.stat.name === "special-defense"
         );
 
         return specialDefense.base_stat ? specialDefense.base_stat : null;
@@ -231,7 +240,7 @@ class PokemonAPI extends RESTDataSource {
     async getHpStat(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const stats = basicResponse.stats;
-        const hp = stats.find(stat => stat.stat.name === "hp");
+        const hp = stats.find((stat) => stat.stat.name === "hp");
 
         return hp.base_stat ? hp.base_stat : null;
     }
@@ -251,12 +260,14 @@ class PokemonAPI extends RESTDataSource {
             speed: parseInt(speed),
             special_attack: parseInt(specialAttack),
             special_defense: parseInt(specialDefense),
-            hp: parseInt(hp)
+            hp: parseInt(hp),
         };
     }
 
     async getPokemonGeneration(pokemonId) {
-        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+        const speciesId = await this.getPokemonSpeciesId(pokemonId);
+
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         return speciesResponse.generation.name
             ? speciesResponse.generation.name
@@ -267,7 +278,9 @@ class PokemonAPI extends RESTDataSource {
         // need this to get the name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
-        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+        const speciesId = await this.getPokemonSpeciesId(id);
+
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         const evolutionChainResponse = await this.get(
             speciesResponse.evolution_chain.url
@@ -291,7 +304,9 @@ class PokemonAPI extends RESTDataSource {
         // need this to get the name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
-        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+        const speciesId = await this.getPokemonSpeciesId(id);
+
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         const evolutionChainResponse = await this.get(
             speciesResponse.evolution_chain.url
@@ -299,8 +314,8 @@ class PokemonAPI extends RESTDataSource {
 
         let currentPokemon = null;
 
-        evolutionChainResponse.chain.evolves_to.forEach(tierIIPokemon => {
-            tierIIPokemon.evolves_to.forEach(tierIIIPokemon => {
+        evolutionChainResponse.chain.evolves_to.forEach((tierIIPokemon) => {
+            tierIIPokemon.evolves_to.forEach((tierIIIPokemon) => {
                 if (tierIIIPokemon.species.name === basicResponse.name) {
                     currentPokemon = tierIIIPokemon;
                 }
@@ -313,21 +328,21 @@ class PokemonAPI extends RESTDataSource {
 
         if (currentPokemon) {
             evolved_at_criteria = currentPokemon.evolution_details
-                .map(evoDetailsObj => {
+                .map((evoDetailsObj) => {
                     const criteriaKeys = Object.keys(evoDetailsObj).filter(
-                        key =>
+                        (key) =>
                             evoDetailsObj[key] &&
                             evoDetailsObj[key] !== "" &&
                             key !== "trigger"
                     );
                     return criteriaKeys
-                        .map(key => {
+                        .map((key) => {
                             return {
                                 name: key,
                                 value:
                                     typeof evoDetailsObj[key] === "object"
                                         ? evoDetailsObj[key].name
-                                        : evoDetailsObj[key].toString()
+                                        : evoDetailsObj[key].toString(),
                             };
                         })
                         .flat();
@@ -342,7 +357,9 @@ class PokemonAPI extends RESTDataSource {
         // need this to get the name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
-        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+        const speciesId = await this.getPokemonSpeciesId(id);
+
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         const evolutionChainResponse = await this.get(
             speciesResponse.evolution_chain.url
@@ -350,8 +367,8 @@ class PokemonAPI extends RESTDataSource {
 
         let currentPokemon = null;
 
-        evolutionChainResponse.chain.evolves_to.forEach(tierIIPokemon => {
-            tierIIPokemon.evolves_to.forEach(tierIIIPokemon => {
+        evolutionChainResponse.chain.evolves_to.forEach((tierIIPokemon) => {
+            tierIIPokemon.evolves_to.forEach((tierIIIPokemon) => {
                 if (tierIIIPokemon.species.name === basicResponse.name) {
                     currentPokemon = tierIIIPokemon;
                 }
@@ -377,7 +394,9 @@ class PokemonAPI extends RESTDataSource {
         // need this to get the name for getEvolvesToPokemonId method
         const basicResponse = await this.get(`/pokemon/${id}`);
 
-        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+        const speciesId = await this.getPokemonSpeciesId(id);
+
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         const evolutionChainResponse = await this.get(
             speciesResponse.evolution_chain.url
@@ -393,12 +412,13 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getNationalPokedexNumber(id) {
-        const speciesResponse = await this.get(`/pokemon-species/${id}`);
+        const speciesId = await this.getPokemonSpeciesId(id);
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         const dexNumbers = speciesResponse.pokedex_numbers;
 
         const nationalDexObj = dexNumbers.find(
-            pokedex => pokedex.pokedex.name === "national"
+            (pokedex) => pokedex.pokedex.name === "national"
         );
 
         return nationalDexObj ? parseInt(nationalDexObj.entry_number) : null;
@@ -407,7 +427,7 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonGames(pokemonId) {
         const pokemonResponse = await this.get(`/pokemon/${pokemonId}`);
 
-        const gameIds = pokemonResponse.game_indices.map(game =>
+        const gameIds = pokemonResponse.game_indices.map((game) =>
             parseUrl(game.version.url)
         );
 
@@ -423,7 +443,7 @@ class PokemonAPI extends RESTDataSource {
             `/pokemon/${pokemonId}/encounters`
         );
 
-        const locationAreaIds = pokemonEncounterResponse.map(locationArea =>
+        const locationAreaIds = pokemonEncounterResponse.map((locationArea) =>
             parseUrl(locationArea.location_area.url)
         );
 
@@ -433,7 +453,7 @@ class PokemonAPI extends RESTDataSource {
     async getLocationAreaIdsFromLocationEndpoint(locationId) {
         const locationResponse = await this.get(`/location/${locationId}`);
 
-        const locationAreaIds = locationResponse.areas.map(area =>
+        const locationAreaIds = locationResponse.areas.map((area) =>
             parseUrl(area.url)
         );
 
@@ -470,7 +490,7 @@ class PokemonAPI extends RESTDataSource {
         );
 
         const pokemonIds = locationAreaResponse.pokemon_encounters.map(
-            pokemon => parseUrl(pokemon.pokemon.url)
+            (pokemon) => parseUrl(pokemon.pokemon.url)
         );
 
         return pokemonIds ? pokemonIds : null;
@@ -482,7 +502,7 @@ class PokemonAPI extends RESTDataSource {
         );
 
         // for each location area for this location, get all of the ids for all of the pokemon at each location area
-        const pokemonIdsPromise = await locationAreaIds.map(async id => {
+        const pokemonIdsPromise = await locationAreaIds.map(async (id) => {
             const monIds = await this.getLocationAreaPokemon(id);
             return monIds;
         });
@@ -501,12 +521,12 @@ class PokemonAPI extends RESTDataSource {
             locationId
         );
 
-        const gameIdsPromise = await locationAreaIds.map(async id => {
+        const gameIdsPromise = await locationAreaIds.map(async (id) => {
             const locationAreaResp = await this.get(`/location-area/${id}`);
 
             const gameIdsArray = locationAreaResp.encounter_method_rates.map(
-                version => {
-                    return version.version_details.map(game => {
+                (version) => {
+                    return version.version_details.map((game) => {
                         return parseUrl(game.version.url);
                     });
                 }
@@ -525,7 +545,7 @@ class PokemonAPI extends RESTDataSource {
     async getAbilitiesIds(id) {
         const basicResponse = await this.get(`/pokemon/${id}`);
         const abilities = basicResponse.abilities;
-        const abilityIds = abilities.map(ability =>
+        const abilityIds = abilities.map((ability) =>
             parseUrl(ability.ability.url)
         );
 
@@ -544,7 +564,7 @@ class PokemonAPI extends RESTDataSource {
         const abilityResponse = await this.get(`/ability/${abilityId}`);
 
         const effects = abilityResponse.effect_entries.map(
-            effect => effect.effect
+            (effect) => effect.effect
         );
 
         return effects ? effects : null;
@@ -554,7 +574,7 @@ class PokemonAPI extends RESTDataSource {
         const pokemonResponse = await this.get(`/pokemon/${pokemonId}`);
 
         const abilityObj = pokemonResponse.abilities.find(
-            ability => parseUrl(ability.ability.url) === abilityId
+            (ability) => parseUrl(ability.ability.url) === abilityId
         );
 
         return abilityObj.is_hidden ? abilityObj.is_hidden : null;
@@ -563,7 +583,7 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonThatCanHaveAbility(abilityId) {
         const abilityResponse = await this.get(`/ability/${abilityId}`);
 
-        const pokemonList = abilityResponse.pokemon.map(pokemon =>
+        const pokemonList = abilityResponse.pokemon.map((pokemon) =>
             parseUrl(pokemon.pokemon.url)
         );
 
@@ -571,15 +591,16 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getPokemonPokedexEntries(pokemonId) {
-        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+        const speciesId = await this.getPokemonSpeciesId(pokemonId);
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
 
         // just get the english entries
         let pokedexEntries = speciesResponse.flavor_text_entries.filter(
-            entry => entry.language.name === "en"
+            (entry) => entry.language.name === "en"
         );
 
         // make all whitespace consistent
-        pokedexEntries.forEach(entry => {
+        pokedexEntries.forEach((entry) => {
             entry.flavor_text = entry.flavor_text.replace(/\s/gm, " ");
         });
 
@@ -597,7 +618,7 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonTypeIds(pokemonId) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
         const types = basicResponse.types;
-        const typeIds = types.map(type => parseUrl(type.type.url));
+        const typeIds = types.map((type) => parseUrl(type.type.url));
         return typeIds ? typeIds : null;
     }
 
@@ -609,7 +630,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeDoubleDamageFrom(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.double_damage_from;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds ? typeIds : null;
     }
@@ -617,7 +638,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeDoubleDamageTo(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.double_damage_to;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds ? typeIds : null;
     }
@@ -625,7 +646,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeHalfDamageFrom(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.half_damage_from;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds ? typeIds : null;
     }
@@ -633,7 +654,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeHalfDamageTo(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.half_damage_to;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds ? typeIds : null;
     }
@@ -641,7 +662,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeNoDamageFrom(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.no_damage_from;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds && typeIds.length ? typeIds : null;
     }
@@ -649,7 +670,7 @@ class PokemonAPI extends RESTDataSource {
     async getTypeNoDamageTo(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const types = typeResponse.damage_relations.no_damage_to;
-        const typeIds = types.map(type => parseUrl(type.url));
+        const typeIds = types.map((type) => parseUrl(type.url));
 
         return typeIds && typeIds.length ? typeIds : null;
     }
@@ -657,7 +678,7 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonOfType(typeId) {
         const typeResponse = await this.get(`/type/${typeId}`);
         const pokemon = typeResponse.pokemon;
-        const pokemonIds = pokemon.map(pokemon =>
+        const pokemonIds = pokemon.map((pokemon) =>
             parseUrl(pokemon.pokemon.url)
         );
 
@@ -665,9 +686,10 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getEggGroupIds(pokemonId) {
-        const speciesResponse = await this.get(`/pokemon-species/${pokemonId}`);
+        const speciesId = await this.getPokemonSpeciesId(pokemonId);
+        const speciesResponse = await this.get(`/pokemon-species/${speciesId}`);
         const eggGroups = speciesResponse.egg_groups;
-        const eggGroupIds = eggGroups.map(eggGroup => parseUrl(eggGroup.url));
+        const eggGroupIds = eggGroups.map((eggGroup) => parseUrl(eggGroup.url));
 
         return eggGroupIds ? eggGroupIds : null;
     }
@@ -682,7 +704,7 @@ class PokemonAPI extends RESTDataSource {
         const eggGroupResponse = await this.get(`/egg-group/${eggGroupId}`);
 
         const pokemon = eggGroupResponse.pokemon_species;
-        const pokemonIds = pokemon.map(pokemon => parseUrl(pokemon.url));
+        const pokemonIds = pokemon.map((pokemon) => parseUrl(pokemon.url));
 
         return pokemonIds ? pokemonIds : null;
     }
@@ -691,7 +713,7 @@ class PokemonAPI extends RESTDataSource {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
 
         const moves = basicResponse.moves;
-        const moveIds = moves.map(move => parseUrl(move.move.url));
+        const moveIds = moves.map((move) => parseUrl(move.move.url));
 
         return moveIds ? moveIds : null;
     }
@@ -738,7 +760,7 @@ class PokemonAPI extends RESTDataSource {
 
     async getMoveEffects(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
-        const moveEffects = moveResponse.effect_entries.map(async effect => {
+        const moveEffects = moveResponse.effect_entries.map(async (effect) => {
             const moveEffectChance = await this.getMoveEffectChance(moveId);
 
             return effect.effect.replace("$effect_chance", moveEffectChance);
@@ -752,7 +774,7 @@ class PokemonAPI extends RESTDataSource {
             `/version-group/${versionGroupId}`
         );
 
-        const gameIds = versionGroupResponse.versions.map(version =>
+        const gameIds = versionGroupResponse.versions.map((version) =>
             parseUrl(version.url)
         );
 
@@ -764,11 +786,11 @@ class PokemonAPI extends RESTDataSource {
         const moves = basicResponse.moves;
 
         const desiredMove = moves.find(
-            move => parseUrl(move.move.url) === moveId
+            (move) => parseUrl(move.move.url) === moveId
         );
 
         const methodNames = desiredMove.version_group_details.map(
-            game => game.move_learn_method.name
+            (game) => game.move_learn_method.name
         );
 
         return methodNames ? methodNames : null;
@@ -779,11 +801,11 @@ class PokemonAPI extends RESTDataSource {
         const moves = basicResponse.moves;
 
         const desiredMove = moves.find(
-            move => parseUrl(move.move.url) === moveId
+            (move) => parseUrl(move.move.url) === moveId
         );
 
         const learnMethods = desiredMove.version_group_details.map(
-            async game => {
+            async (game) => {
                 const gameIds = await this.getMoveLearnMethodGameIds(
                     parseUrl(game.version_group.url)
                 );
@@ -794,7 +816,7 @@ class PokemonAPI extends RESTDataSource {
                         game.level_learned_at > 0
                             ? game.level_learned_at
                             : null,
-                    games: gameIds
+                    games: gameIds,
                 };
             }
         );
@@ -805,7 +827,14 @@ class PokemonAPI extends RESTDataSource {
     async getPokemonSprites(pokemonId) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
 
-        return basicResponse.sprites ? basicResponse.sprites : null;
+        const sprites = basicResponse.sprites;
+
+        // if pokeapi has a null value, give it an img src (some of the pokemon have the value as null, but creating a dynamic img src does pull up the correct resource)
+        if (!sprites.front_default) {
+            sprites.front_default = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
+        }
+
+        return sprites ? sprites : null;
     }
 
     async getRegionName(regionId) {
@@ -817,7 +846,7 @@ class PokemonAPI extends RESTDataSource {
     async getRegionLocations(regionId) {
         const regionResponse = await this.get(`/region/${regionId}`);
 
-        const locationIds = regionResponse.locations.map(location =>
+        const locationIds = regionResponse.locations.map((location) =>
             parseUrl(location.url)
         );
 
@@ -827,7 +856,7 @@ class PokemonAPI extends RESTDataSource {
     async getRegionGames(regionId) {
         const regionResponse = await this.get(`/region/${regionId}`);
 
-        const gameIds = regionResponse.version_groups.map(game =>
+        const gameIds = regionResponse.version_groups.map((game) =>
             parseUrl(game.url)
         );
 
@@ -859,7 +888,7 @@ class PokemonAPI extends RESTDataSource {
     async getGameRegions(gameId) {
         const gameResponse = await this.get(`/version-group/${gameId}`);
 
-        const regionIds = gameResponse.regions.map(region =>
+        const regionIds = gameResponse.regions.map((region) =>
             parseUrl(region.url)
         );
 
