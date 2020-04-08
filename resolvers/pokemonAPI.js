@@ -172,7 +172,7 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getPokemonSpeciesId(pokemonId) {
-        const basicResponse = await this.get(`/pokemon/${id}`);
+        const basicResponse = await this.get(`/pokemon/${pokemonId}`);
         const speciesId = parseUrl(basicResponse.species.url);
 
         return speciesId;
