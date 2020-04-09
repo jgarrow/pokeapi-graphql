@@ -763,7 +763,10 @@ class PokemonAPI extends RESTDataSource {
         const moveEffects = moveResponse.effect_entries.map(async (effect) => {
             const moveEffectChance = await this.getMoveEffectChance(moveId);
 
-            return effect.effect.replace("$effect_chance", moveEffectChance);
+            return effect.short_effect.replace(
+                "$effect_chance",
+                moveEffectChance
+            );
         });
 
         return moveEffects ? moveEffects : null;
