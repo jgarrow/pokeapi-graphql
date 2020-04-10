@@ -93,11 +93,17 @@ const typeDefs = gql`
         effects: [String] # possible status condition effect
         damage_class: String # physical or special
         # description: String
+        descriptions: [MoveDescription]
     }
 
     type MoveLearnMethod {
         method: String
         level_learned_at: Int
+        games: [Game]
+    }
+
+    type MoveDescription {
+        description: String
         games: [Game]
     }
 

@@ -53,7 +53,7 @@ const resolvers = {
         },
         game: (parent, args, { dataSources }) => {
             return args.id;
-        }
+        },
     },
     Pokemon: {
         id: (parent, args, { dataSources }) => {
@@ -94,7 +94,7 @@ const resolvers = {
                 parent
             );
 
-            const locationIds = locationAreaIds.map(async locAreaId => {
+            const locationIds = locationAreaIds.map(async (locAreaId) => {
                 return await dataSources.pokemonAPI.getLocationIdFromLocationAreaEndpoint(
                     locAreaId
                 );
@@ -110,10 +110,10 @@ const resolvers = {
                 parent
             );
 
-            const pokemonAndAbilityIds = abilityIds.map(ability => {
+            const pokemonAndAbilityIds = abilityIds.map((ability) => {
                 return {
                     pokemonId: parent,
-                    abilityId: ability
+                    abilityId: ability,
                 };
             });
 
@@ -127,10 +127,10 @@ const resolvers = {
         },
         moves: async (parent, args, { dataSources }) => {
             const moveIds = await dataSources.pokemonAPI.getMoveIds(parent);
-            const pokemonAndMoveIds = moveIds.map(moveId => {
+            const pokemonAndMoveIds = moveIds.map((moveId) => {
                 return {
                     pokemonId: parent,
-                    moveId: moveId
+                    moveId: moveId,
                 };
             });
 
@@ -144,7 +144,7 @@ const resolvers = {
         },
         generation: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokemonGeneration(parent);
-        }
+        },
     },
     Location: {
         id: (parent, args, { dataSources }) => parent,
@@ -161,7 +161,7 @@ const resolvers = {
             return dataSources.pokemonAPI.getLocationPokemonFromLocationAreas(
                 parent
             );
-        }
+        },
     },
     Ability: {
         id: (parent, args, { dataSources }) => parent.abilityId,
@@ -181,7 +181,7 @@ const resolvers = {
             return dataSources.pokemonAPI.getPokemonThatCanHaveAbility(
                 parent.abilityId
             );
-        }
+        },
     },
     DexEntry: {
         description: (parent, args, { dataSources }) => {
@@ -189,7 +189,7 @@ const resolvers = {
         },
         game: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getPokedexEntryVersion(parent);
-        }
+        },
     },
     Type: {
         id: (parent, args, { dataSources }) => parent,
@@ -216,7 +216,7 @@ const resolvers = {
         },
         no_damage_to: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getTypeNoDamageTo(parent);
-        }
+        },
     },
     EggGroup: {
         id: (parent, args, { dataSources }) => parent,
@@ -225,7 +225,7 @@ const resolvers = {
         },
         pokemon: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEggGroupPokemonIds(parent);
-        }
+        },
     },
     Move: {
         id: (parent, args, { dataSources }) => parent.moveId,
@@ -250,12 +250,17 @@ const resolvers = {
         effects: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getMoveEffects(parent.moveId);
         },
+        descriptions: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getEnglishMoveDescriptionObjects(
+                parent.moveId
+            );
+        },
         learn_methods: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getMoveLearnMethods(
                 parent.pokemonId,
                 parent.moveId
             );
-        }
+        },
     },
     Region: {
         id: (parent, args, { dataSources }) => parent,
@@ -267,7 +272,7 @@ const resolvers = {
         },
         locations: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getRegionLocations(parent);
-        }
+        },
     },
     Game: {
         id: (parent, args, { dataSources }) => parent,
@@ -287,12 +292,24 @@ const resolvers = {
             );
 
             return dataSources.pokemonAPI.getGameRegions(gameId);
-        }
+        },
     },
     NameAndId: {
         id: (parent, args, { dataSources }) => parent.id,
-        name: (parent, args, { dataSources }) => parent.name
-    }
+        name: (parent, args, { dataSources }) => parent.name,
+    },
+    MoveDescription: {
+        description: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getMoveDescriptionFromMoveDescriptionObject(
+                parent
+            );
+        },
+        games: (parent, args, { dataSources }) => {
+            return dataSources.pokemonAPI.getGameIdsFromMoveDescriptionObject(
+                parent
+            );
+        },
+    },
 };
 
 module.exports = { resolvers };

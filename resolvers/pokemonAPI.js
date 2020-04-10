@@ -23,7 +23,6 @@ class PokemonAPI extends RESTDataSource {
     }
 
     async getAllPokemonIds(start = 0, end = 964) {
-        console.log(`pokemon?offset=${start}&limit=${end}`);
         const response = await this.get(`pokemon?offset=${start}&limit=${end}`);
 
         const pokemonIds = response.results.map((pokemon) =>
@@ -770,6 +769,38 @@ class PokemonAPI extends RESTDataSource {
         });
 
         return moveEffects ? moveEffects : null;
+    }
+
+    async getEnglishMoveDescriptionObjects(moveId) {
+        const moveResponse = await this.get(`/move/${moveId}`);
+
+        // just get the english entries
+        const moveDescriptions = moveResponse.flavor_text_entries.filter(
+            (entry) => entry.language.name === "en"
+        );
+
+        return moveDescriptions;
+    }
+
+    async getMoveDescriptionFromMoveDescriptionObject(moveDescriptionObj) {
+        // make all whitespace consistent
+        const description = moveDescriptionObj.flavor_text.replace(/\s/gm, " ");
+
+        return description;
+    }
+
+    async getGameIdsFromMoveDescriptionObject(moveDescriptionObj) {
+        const versionGroupId = parseUrl(moveDescriptionObj.version_group.url);
+
+        const versionGroupResponse = await this.get(
+            `/version-group/${versionGroupId}`
+        );
+
+        const gameIds = versionGroupResponse.versions.map((version) =>
+            parseUrl(version.url)
+        );
+
+        return gameIds;
     }
 
     async getMoveLearnMethodGameIds(versionGroupId) {
