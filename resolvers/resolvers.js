@@ -263,7 +263,8 @@ const resolvers = {
         learn_methods: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getMoveLearnMethods(
                 parent.pokemonId,
-                parent.moveId
+                parent.moveId,
+                parent.game
             );
         },
         games: (parent, args, { dataSources }) => {},

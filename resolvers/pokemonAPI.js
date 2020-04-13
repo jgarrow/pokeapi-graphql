@@ -834,8 +834,6 @@ class PokemonAPI extends RESTDataSource {
             (entry) => entry.language.name === "en"
         );
 
-        // console.log("english descriptions: ", moveDescriptions);
-
         const moveDescriptionFromGamePromise = await moveDescriptions.map(
             async (moveDesc) => {
                 const versionGroupId = parseUrl(moveDesc.version_group.url);
@@ -899,7 +897,9 @@ class PokemonAPI extends RESTDataSource {
         return gameIds;
     }
 
-    async getMoveLearnMethodGameIds(versionGroupId) {
+    // need to filter Move learn method ids to only return
+    // those that are in the game passed in args
+    async getMoveLearnMethodGameIds(versionGroupId, game) {
         const versionGroupResponse = await this.get(
             `/version-group/${versionGroupId}`
         );
@@ -908,7 +908,21 @@ class PokemonAPI extends RESTDataSource {
             parseUrl(version.url)
         );
 
-        return gameIds ? gameIds : null;
+        const gameNamesPromise = gameIds.map(async (gameId) => {
+            const versionResponse = await this.get(`/version/${gameId}`);
+
+            return versionResponse.name;
+        });
+
+        const gameNames = await Promise.all(gameNamesPromise);
+
+        if (gameNames.includes(game)) {
+            return gameIds;
+        } else {
+            return;
+        }
+
+        // return gameIds ? gameIds : null;
     }
 
     async getMoveLearnMethodNames(pokemonId, moveId) {
@@ -926,7 +940,9 @@ class PokemonAPI extends RESTDataSource {
         return methodNames ? methodNames : null;
     }
 
-    async getMoveLearnMethods(pokemonId, moveId) {
+    // need to filter Move learn method ids to only return
+    // those that are in the game passed in args
+    async getMoveLearnMethods(pokemonId, moveId, gameFromArgs) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
         const moves = basicResponse.moves;
 
@@ -934,22 +950,31 @@ class PokemonAPI extends RESTDataSource {
             (move) => parseUrl(move.move.url) === moveId
         );
 
-        const learnMethods = desiredMove.version_group_details.map(
+        const learnMethodsPromise = await desiredMove.version_group_details.map(
             async (game) => {
-                const gameIds = await this.getMoveLearnMethodGameIds(
-                    parseUrl(game.version_group.url)
+                let gameIds = await this.getMoveLearnMethodGameIds(
+                    parseUrl(game.version_group.url),
+                    gameFromArgs
                 );
 
-                return {
-                    method: game.move_learn_method.name,
-                    level_learned_at:
-                        game.level_learned_at > 0
-                            ? game.level_learned_at
-                            : null,
-                    games: gameIds,
-                };
+                if (gameIds) {
+                    return {
+                        method: game.move_learn_method.name,
+                        level_learned_at:
+                            game.level_learned_at > 0
+                                ? game.level_learned_at
+                                : null,
+                        games: gameIds,
+                    };
+                } else {
+                    return;
+                }
             }
         );
+
+        let learnMethods = await Promise.all(learnMethodsPromise);
+
+        learnMethods = learnMethods.filter((method) => method !== undefined);
 
         return learnMethods ? learnMethods : null;
     }
