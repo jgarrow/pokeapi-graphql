@@ -15,7 +15,7 @@ const typeDefs = gql`
         sprites: Sprites # array of Sprite objects
         base_stats: Stats
         pokedex_entries: [DexEntry] # array of DexEntry objects
-        moves: [Move] # array of Move objects
+        moves(game: String!): [Move] # array of Move objects
         locations: [Location] # array of Location objects
         evolves_from: Pokemon
         evolution_criteria: [EvolutionCriteria]
@@ -93,7 +93,8 @@ const typeDefs = gql`
         effects: [String] # possible status condition effect
         damage_class: String # physical or special
         # description: String
-        descriptions: [MoveDescription]
+        description: MoveDescription
+        games: [Game]
     }
 
     type MoveLearnMethod {
@@ -159,3 +160,7 @@ const typeDefs = gql`
 `;
 
 module.exports = { typeDefs };
+
+// pass in game name as an argument for Moves
+// filter through moves for that pokemon to only show the
+// moves that the pokemon can learn in that game

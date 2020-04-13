@@ -5,6 +5,7 @@ class PokemonAPI extends RESTDataSource {
     constructor() {
         super();
         this.baseURL = "https://pokeapi.co/api/v2";
+        // this.baseURL = "http://localhost:8000/api/v2";
     }
 
     async getallPokemonNamesAndIds(start = 0, end = 964) {
@@ -708,13 +709,64 @@ class PokemonAPI extends RESTDataSource {
         return pokemonIds ? pokemonIds : null;
     }
 
-    async getMoveIds(pokemonId) {
+    // need to filter Move ids to only return
+    // those that are in the game passed in args
+    async getMoveIds(pokemonId, game) {
         const basicResponse = await this.get(`/pokemon/${pokemonId}`);
-
         const moves = basicResponse.moves;
-        const moveIds = moves.map((move) => parseUrl(move.move.url));
 
-        return moveIds ? moveIds : null;
+        const movesFromGamePromise = await moves.map(async (move) => {
+            const versionGroupIds = move.version_group_details.map(
+                (versionGroup) => parseUrl(versionGroup.version_group.url)
+            );
+
+            // all game ids for games in which the pokemon can learn this move
+            const allVersionIdsPromise = await versionGroupIds
+                .map(async (versionGroupId) => {
+                    const versionGroupResponse = await this.get(
+                        `/version-group/${versionGroupId}`
+                    );
+
+                    const versionIds = versionGroupResponse.versions
+                        .map((game) => parseUrl(game.url))
+                        .flat();
+
+                    return versionIds;
+                })
+                .flat();
+
+            const allVersionIds = await Promise.all(allVersionIdsPromise);
+
+            // get names of all games that the pokemon can learn this move
+            const gameNamesPromise = allVersionIds
+                .flat()
+                .map(async (gameId) => {
+                    const versionResponse = await this.get(
+                        `/version/${gameId}`
+                    );
+                    return versionResponse.name;
+                });
+
+            const gameNames = await Promise.all(gameNamesPromise);
+
+            // return the move if it can be learned in the requested game
+            if (gameNames.includes(game)) {
+                return move;
+            } else {
+                return;
+            }
+        });
+
+        let movesFromGame = await Promise.all(movesFromGamePromise);
+
+        // if a move isn't in the game, it will be an undefined element in the movesFromGame array
+        movesFromGame = movesFromGame.filter((move) => move !== undefined);
+
+        const moveIdsFromGame = movesFromGame.map((move) =>
+            parseUrl(move.move.url)
+        );
+
+        return moveIdsFromGame ? moveIdsFromGame : null;
     }
 
     async getMoveName(moveId) {
@@ -757,11 +809,13 @@ class PokemonAPI extends RESTDataSource {
         return moveResponse.effect_chance ? moveResponse.effect_chance : null;
     }
 
+    // get short effect for brevity
     async getMoveEffects(moveId) {
         const moveResponse = await this.get(`/move/${moveId}`);
         const moveEffects = moveResponse.effect_entries.map(async (effect) => {
             const moveEffectChance = await this.getMoveEffectChance(moveId);
 
+            // replave the string "$effect_chance" with the actual percentage
             return effect.short_effect.replace(
                 "$effect_chance",
                 moveEffectChance
@@ -771,7 +825,8 @@ class PokemonAPI extends RESTDataSource {
         return moveEffects ? moveEffects : null;
     }
 
-    async getEnglishMoveDescriptionObjects(moveId) {
+    // need to filter based on game
+    async getEnglishMoveDescriptionObjects(moveId, game) {
         const moveResponse = await this.get(`/move/${moveId}`);
 
         // just get the english entries
@@ -779,7 +834,48 @@ class PokemonAPI extends RESTDataSource {
             (entry) => entry.language.name === "en"
         );
 
-        return moveDescriptions;
+        // console.log("english descriptions: ", moveDescriptions);
+
+        const moveDescriptionFromGamePromise = await moveDescriptions.map(
+            async (moveDesc) => {
+                const versionGroupId = parseUrl(moveDesc.version_group.url);
+
+                const versionGroupResponse = await this.get(
+                    `/version-group/${versionGroupId}`
+                );
+
+                const gameIds = versionGroupResponse.versions.map((game) =>
+                    parseUrl(game.url)
+                );
+
+                const gameNamesPromise = gameIds.map(async (gameId) => {
+                    const gameResponse = await this.get(`/version/${gameId}`);
+
+                    return gameResponse.name;
+                });
+
+                const gameNames = await Promise.all(gameNamesPromise);
+
+                // return the moveDesc if the move can be learned in the requested game
+                if (gameNames.includes(game)) {
+                    return moveDesc;
+                } else {
+                    return;
+                }
+            }
+        );
+
+        let moveDescriptionFromGame = await Promise.all(
+            moveDescriptionFromGamePromise
+        );
+
+        // if a moveDesc isn't in the game, it will be an undefined element in the moveDescriptionFromGame array
+        moveDescriptionFromGame = moveDescriptionFromGame.filter(
+            (desc) => desc !== undefined
+        );
+
+        // will be an array with only 1 element
+        return moveDescriptionFromGame[0];
     }
 
     async getMoveDescriptionFromMoveDescriptionObject(moveDescriptionObj) {

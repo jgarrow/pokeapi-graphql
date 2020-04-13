@@ -126,11 +126,15 @@ const resolvers = {
             return dataSources.pokemonAPI.getEggGroupIds(parent);
         },
         moves: async (parent, args, { dataSources }) => {
-            const moveIds = await dataSources.pokemonAPI.getMoveIds(parent);
+            const moveIds = await dataSources.pokemonAPI.getMoveIds(
+                parent,
+                args.game
+            );
             const pokemonAndMoveIds = moveIds.map((moveId) => {
                 return {
                     pokemonId: parent,
                     moveId: moveId,
+                    game: args.game,
                 };
             });
 
@@ -250,9 +254,10 @@ const resolvers = {
         effects: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getMoveEffects(parent.moveId);
         },
-        descriptions: (parent, args, { dataSources }) => {
+        description: (parent, args, { dataSources }) => {
             return dataSources.pokemonAPI.getEnglishMoveDescriptionObjects(
-                parent.moveId
+                parent.moveId,
+                parent.game
             );
         },
         learn_methods: (parent, args, { dataSources }) => {
@@ -261,6 +266,7 @@ const resolvers = {
                 parent.moveId
             );
         },
+        games: (parent, args, { dataSources }) => {},
     },
     Region: {
         id: (parent, args, { dataSources }) => parent,
